@@ -1,0 +1,13 @@
+div.class-selector {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+div.analyse-card-content {
+  padding-bottom: 0px;
+}
+
+div.analyse-card-actions {
+  padding-top: 0px;
+  float: right;
+}

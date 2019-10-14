@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico?v=2" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=fetch"></script> 
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script>
+      // Polyfill
+      if (!String.prototype.includes) {
+        console.log('Polyfilling String.prototype.includes');
+        String.prototype.includes = function(search, start) {
+          'use strict';
+          if (typeof start !== 'number') {
+            start = 0;
+          }
+
+          if (start + search.length > this.length) {
+            return false;
+          } else {
+            return this.indexOf(search, start) !== -1;
+          }
+        };
+      }
+      if (!Array.prototype.includes) {
+        console.log('Polyfilling Array.prototype.includes');
+        Array.prototype.includes = function(el) {
+          return this.indexOf(el) !== -1;
+        };
+      }
+    </script>
+    <script src="https://unpkg.com/@ungap/url-search-params"></script> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>Ellipsis Earth Intelligence</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

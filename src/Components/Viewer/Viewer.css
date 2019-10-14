@@ -1,0 +1,121 @@
+div.content {
+    margin-bottom: 0em;
+}
+
+.viewer {
+  width: 100vw;
+  height: 100%;
+  position: relative;
+}
+
+.viewer-main-container {
+  height: calc(100% - 48px);
+}
+
+.viewer-menu {
+  width: 100vw;
+  height: 48px;
+}
+
+.viewer-menu > .viewer-menu-button {
+  padding: 0px;
+  height: 100%;
+}
+
+.viewer-menu-button-content {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%); 
+}
+
+.viewer-menu > div {
+  display: inline-block;
+  width: 33.33333vw;
+  height: 100%;
+}
+
+.viewer-menu > .button {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-left-width: 1.4px;
+  border-right-width: 1.4px;
+}
+
+.viewer-pane {
+  position: relative;
+  float: left;
+  height: 100%;
+  background-color: #f4f4f4;
+}
+
+.map-pane {
+  width: 100vw;
+  position: relative;
+  background-color: #f4f4f4;
+}
+
+.leaflet-container {
+  height: 100%;
+  position: relative;
+}
+
+.classes-data-graph {
+  position: absolute;
+  width: 500px;
+  text-align: left;
+  z-index: 999;
+  bottom: 350px;
+}
+
+.measurements-data-graph {
+  position: absolute;
+  width: 500px;
+  text-align: left;
+  z-index: 999;
+  bottom: 50px;
+}
+
+div.loading-spinner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
+}
+
+button.expand-icon {
+  padding: 6px;
+}
+
+div.card-content-item {
+  margin-top: 8px;
+}
+
+button.card-submit-button {
+  display: block;
+  width: 50%;
+  margin-left: auto;
+}
+
+.expanded {
+  transform: rotate(180deg);
+}
+
+.selector {
+  width: 100%;
+}
+
+div.selector-single {
+  padding-top: 0px;
+}
+
+@media only screen and (max-width: 700px) {
+  .controls-pane {
+    width: 100vw;
+  }
+  
+  .data-pane {
+    width: 100vw;
+  }
+}

@@ -1,0 +1,303 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.content {
+  position: absolute;
+  bottom: 0;
+  height: calc(100% - 59px);
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.content-full {
+  height: 100%;
+}
+
+.main-content {
+  min-height: 78.1vh;
+  scroll-behavior: smooth;
+  margin-bottom: 32px;
+}
+
+.main-block {
+  padding-bottom: 3em;
+}
+
+.main-block-first {
+  padding-top: 3em;
+}
+
+.main-block-accented {
+  background-color: #00a3a3;
+  color: #ffffff;
+}
+
+.main-block-accented h1, .main-block-accented h2, .main-block-accented h3, 
+.main-block-accented h4 {
+  color: #ffffff;
+}
+
+.main-block-content {
+  width: 40em;
+  max-width: 80vw;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main-block-content-left {
+  text-align: left;
+}
+
+.main-block-header {
+  background-color: #026464;
+  padding: 0.3em 0em;
+  margin-bottom: 2em;
+
+  font-size: 26pt;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.main-block-header h1 {
+  color: white;
+  margin: 0;
+  font-size: inherit;
+}
+
+.main-center-paragraph {
+  text-align: center;
+  margin-bottom: 2em;
+}
+
+.main-center-paragraph-first {
+  margin-top: 2em;
+}
+
+.main-block > p.main-center-paragraph:last-of-type {
+  margin-bottom: 1em;
+}
+
+.main-block-content-list {
+  text-align: left
+}
+
+.main-block-content-list-item {
+  margin-bottom: 0.7em;
+}
+
+.main-block-button-container {
+  display: inline-block;
+  background-color: #ffffff;
+}
+
+.main-block-button {
+  width: 100%;
+  height: 45px;
+  border: 3px solid #026464;
+  border-radius: 0px;
+}
+
+.main-block-button-container .main-block-button {
+  width: 100%;
+  height: 45px;
+  border: 1px solid #026464;
+  border-radius: 0px;
+}
+
+.main-block-button-container .main-block-button:hover {
+  border: 1px solid #026464;
+}
+
+.main-block-single-button {
+  display: block;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.main-block-double-button {
+  width: 35%;
+  margin: 0 1em;
+}
+
+.main-block-triple-button {
+  width: 20%;
+  margin: 0 0.5em;
+}
+
+.key-words {
+  color: #026464;
+  font-style: italic;
+  font-weight: bold;
+}
+
+button:focus {
+  outline: 0;
+}
+
+.button {
+  padding: 0.5em 1em;
+  text-align: center;
+  background-color: #ffffff;
+  color: #00a3a3;
+  border: 3px solid #026464;
+  text-decoration: none;
+  font-weight: bold;
+
+  -webkit-transition-duration: 0.2s; /* Safari */
+  transition-duration: 0.2s;
+  cursor: pointer;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+button.button-selected {
+  background-color: #00a3a3;
+  color: #ffffff;
+}
+
+.button:hover {
+  background-color: #00a3a3;
+  color: #ffffff;
+}
+
+.button:hover:enabled {
+    background-color: #00a3a3;
+    color: #ffffff;
+}
+
+.button:disabled {
+  background-color: #aaaaaa;
+}
+
+.button-accented {
+  border: 3px solid #026464;
+  background-color: #ffffff;
+  color: #00a3a3
+}
+
+.button-accented:hover:enabled {
+  background-color: #00a3a3;
+  color: #ffffff
+}
+
+.button-a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.button-a:hover {
+  text-decoration: none;
+}
+
+.button-double-container {
+  text-align: center;
+  margin: 24px 0px;
+}
+
+button.button-double {
+  display: inline-block;
+  width: 40%;
+  max-width: 300px;
+  margin: 0 24px;
+}
+
+.modal-overlay {
+  top: 3.5em;
+  z-index: 10000000;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+.display-none {
+  display: none; 
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+pre code {
+  color: white;
+}
+
+svg.carousel-navigate-button {
+  font-size: 64px;
+}
+
+button.mui-tab {
+  flex-grow: 1;
+  margin: auto;
+}
+
+button.MuiTab-root {
+  min-width: 0px;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width : 640px) {
+  .main-block-header {    
+      font-size: 22pt;
+  }
+
+  .main-block-single-button {
+    width: 100%;
+  }
+
+  button.button-double {
+    width: 44%;
+    margin: 0 8px;
+  }
+
+  .hide-on-small-screens {
+    display: none;
+  }
+}

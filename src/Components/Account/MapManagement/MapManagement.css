@@ -1,0 +1,40 @@
+.map-management-select {
+  width: 70%;
+  min-width: 400px;
+  margin: 0 auto;
+}
+
+.map-management-main {
+  margin-top: 20px;
+}
+
+.map-management-mode-block {
+  margin-top: 20px;
+  font-size: 11pt;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted gray;
+  text-align: right;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 500px;
+  background-color: gray;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 14px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

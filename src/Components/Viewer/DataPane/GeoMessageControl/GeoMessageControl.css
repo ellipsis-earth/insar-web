@@ -1,0 +1,49 @@
+div.class-selector {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.geomessage-control {
+  height: calc(100% - 85px);
+}
+
+div.card-form-control {
+  width: 100%;
+}
+
+div.card-form-control:not(:first-of-type) {
+  margin-top: 12px;
+}
+
+div.groups-filter-card {
+  height: 50px;
+  transition: height 300ms ease-out;
+}
+
+div.groups-filter-card-expanded {
+  height: 280px;
+}
+
+div.groups-filter-card-header {
+  padding-top: 12px;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+div.geomessage-messages-card {
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
+
+div.geomessage-messages-card-feed {
+  height: calc(100% - 53px);
+}
+
+div.geomessage-messages-card-feed-filters {
+  height: calc(100% - 285px);
+}
+
+button.feed-download-geometry-button {
+  padding: 8px;
+  margin-left: 4px;
+}

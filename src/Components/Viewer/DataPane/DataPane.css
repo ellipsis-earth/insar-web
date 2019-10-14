@@ -1,0 +1,64 @@
+.data-pane {
+  width: 25vw;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+.data-pane-card {
+  margin-top: 8px;
+}
+
+div.data-pane-card-content {
+  position: relative;
+  padding-top: 0px;
+  min-height: 70px;
+  text-align: left;
+  font-size: 15px;
+}
+
+div.data-pane-title-card {
+  height: 77px;
+}
+
+div.data-pane-title-header {
+  padding: 4px;
+  padding-top: 8px;
+}
+
+h2.data-pane-title {
+  width: 60%;
+  height: 32px;
+  line-height: 32px;
+  margin: auto;
+  overflow: hidden;
+}
+
+div.data-pane-title-actions {
+  position: absolute;
+}
+
+button.data-pane-title-actions-button {
+  padding: 8px;
+}
+
+div.data-pane-title-actions-right {
+  right: 12px;
+}
+
+div.data-pane-card-content .loading-spinner {
+  top: 0px;
+}
+
+button.geomessage-feed-button {
+  margin-top: 8px;
+  width: 100%;
+}
+
+div.data-pane-text-field {
+  width: 100%;
+}
+

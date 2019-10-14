@@ -1,0 +1,159 @@
+.geomessage-card {
+  margin: 12px 8px;
+  width: 70%;
+  text-align: left;
+}
+
+.geomessage-card-own {
+  margin-left: auto;
+}
+
+div.geomessage-card-private {
+  background-color: #eaeaea;
+}
+
+div.geomessage-card-target {
+  background-color: #dae8e8;
+}
+
+div.geomessage-card-header {
+  padding: 8px;
+}
+
+.geomessage-card-title {
+  font-size: 16px;
+  color: #026464;
+}
+
+.geomessage-card-subtitle {
+  font-size: 12px;
+}
+
+div.geomessage-card-content {
+  padding: 0px 8px 0px 8px;
+  font-size: 14px;
+  text-align: left;
+}
+
+div.geomessage-card-content:last-child {
+  padding-bottom: 8px;
+}
+
+div.geomessage-card-actions {
+  padding: 0px 8px 0px 8px;
+}
+
+.geomessage-attachments {
+  margin-top: 8px;
+}
+
+button.geomessage-card-action-button {
+  padding: 8px;
+  margin-left: auto;
+  margin-top: 2px;
+}
+
+svg.geomessage-delete-button {
+  font-size: 18px;
+}
+
+.geomessage-lightbox {
+	position: fixed;
+	width: 100vw;
+	height: 100%;
+	top: 0;
+	left: 0vw;
+	background: rgba(0, 0, 0, 0.75);
+  cursor: zoom-out;
+  z-index: 9999999;
+}
+
+.geomessage-lightbox-image {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 95%;
+  max-height: 95%;
+  width: auto;
+  margin: auto;
+  overflow: auto;
+
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Standard syntax */
+}
+
+button.geomessage-attachment-button {
+  display: inline-block;
+  position: relative;
+  width: 90px;
+  height: 90px;
+}
+
+button.geomessage-attachment-button:not(:first-child) {
+  margin-left: 16px;
+}
+
+button.geomessage-attachment-image-button {
+  padding: 0px;
+  padding-top: 7px;
+  cursor: zoom-in;
+}
+
+button.geomessage-attachment-form-button {
+  padding-top: 11px
+}
+
+button.geomessage-attachment-button img {
+  width: 75px;
+  height: 75px;
+  cursor: zoom-in;
+}
+
+svg.geomessage-open-form-button-icon {
+  font-size: 30px;
+}
+
+button.geomessage-feed-element-button {
+  padding: 0px;
+  color: rgba(0, 0, 0, 0.54);
+  text-transform: none;
+  font-size: 12px;
+  text-align: left;
+}
+
+.geomessage-lightbox-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;  
+  transform: translate(-50%, -50%);
+  padding: 32px;
+  padding-top: 8px;
+
+  height: auto;
+  min-width: 800px;
+
+  margin: auto;
+  overflow-y: auto;
+  
+  background-color: #fafafafa;
+}
+
+.geomessage-lightbox-close-button {
+  position: fixed;
+  top: 50px;
+  right: 60px;
+  width: 50px;
+  height: 50px;
+}
+
+@media only screen and (max-width: 600px) {
+  .geomessage-lightbox-close-button {
+    top: 20px;
+    right: 20px;
+  }
+}

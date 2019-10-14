@@ -1,0 +1,59 @@
+{
+  "name": "ellipsis_earth_intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://ellipsis-earth.com",
+  "dependencies": {
+    "@material-ui/core": "^4.4.0",
+    "@material-ui/icons": "^4.2.1",
+    "@material-ui/lab": "^4.0.0-alpha.26",
+    "browser-image-resizer": "^2.0.1",
+    "downloadjs": "^1.4.7",
+    "file-saver": "^2.0.2",
+    "highlight.js": "^9.15.6",
+    "history": "^4.9.0",
+    "html-react-parser": "^0.6.4",
+    "jimp": "^0.6.4",
+    "jquery": "^3.4.1",
+    "jquery-ui": "^1.12.1",
+    "js-file-download": "^0.4.7",
+    "leaflet": "^1.5.1",
+    "leaflet-draw": "^1.0.4",
+    "lodash.clonedeep": "^4.5.0",
+    "moment": "^2.24.0",
+    "papaparse": "^4.6.3",
+    "plotly.js": "^1.47.4",
+    "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.12",
+    "react-device-detect": "^1.6.2",
+    "react-dom": "^16.8.6",
+    "react-leaflet": "^2.3.0",
+    "react-leaflet-portal": "^0.1.11",
+    "react-modal": "^3.8.1",
+    "react-plotly.js": "^2.3.0",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "^3.1.1",
+    "react-select": "^2.4.3",
+    "react-sliding-pane": "^3.1.0",
+    "react-table": "^6.10.0",
+    "react-vis": "^1.11.7",
+    "remarkable": "^2.0.0",
+    "streamsaver": "^2.0.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {}
+}

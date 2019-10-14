@@ -1,0 +1,11 @@
+.rv-xy-plot {
+  height: auto !important;
+}
+
+.rv-xy-plot__axis--vertical {
+  transform: translate(0%, 5%) !important;
+}
+
+.rv-xy-plot__axis--horizontal {
+  transform: translate(42px, 160px) !important;
+}

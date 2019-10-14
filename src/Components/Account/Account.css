@@ -1,0 +1,75 @@
+.account-title {
+  margin-top: 1em;
+}
+
+.login-block {
+  max-width: 90vw;
+  margin: auto;
+}
+
+.login-input-label-div {
+  width: 100%;
+  max-width: 70vw;
+  margin: 0 auto;
+  margin-bottom: 18px;
+}
+
+.login-input-label-div:last-child {
+  margin-top: 32px;
+}
+
+.login-input-label {
+  text-align: left;
+}
+
+.login-input {
+  width: 50%;
+  min-width: 300px;
+  height: 30px;
+
+  padding: 0px 8px;
+
+  text-align: center;
+  font-size: 15px;
+}
+
+.map-management-button {
+  height: 2.5em;
+}
+
+.management-title {
+  margin-top: 1em;
+}
+
+.management-block {
+  width: 800px;
+  max-width: 90vw;
+  margin: auto;
+  margin-bottom: 40px;
+}
+
+.management-input-label-div {
+  width: 80%;
+  max-width: 70vw;
+  margin: 0 auto;
+  margin-bottom: 8px;
+}
+
+.management-input-label {
+  text-align: left;
+}
+
+.management-input {
+  width: 50%;
+  min-width: 300px;
+  height: 30px;
+
+  padding: 0px 8px;
+
+  text-align: center;
+  font-size: 15px;
+}
+
+.management-table-input-field {
+  width: 100%;
+}
