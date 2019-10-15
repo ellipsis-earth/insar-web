@@ -308,6 +308,10 @@ class Viewer extends PureComponent {
     );
   }
 
+  onAsReference = () => {
+    this.setState({ referenceElement: this.state.selectedElement });
+  }
+
   selectFeature = (type, feature, hasAggregatedData, color, cb) => {
     let element = {
       type: type,
@@ -623,6 +627,7 @@ class Viewer extends PureComponent {
               onFlyTo={this.onFlyTo}
               onDeselect={this.deselectCurrentElement}
               onDeletePolygon={this.updatePolygons}
+              onAsReference={this.onAsReference}
             />
             <Map
               center={DEFAULT_VIEWPORT.center}
@@ -645,6 +650,7 @@ class Viewer extends PureComponent {
             geolocation={this.state.geolocation}
             action={this.state.dataPaneAction}
             element={this.state.selectedElement}
+            referenceElement={this.state.referenceElement}
             jumpToMessage={this.state.jumpToMessage}
             onDataPaneAction={this.onDataPaneAction}
             onFlyTo={this.onFlyTo}

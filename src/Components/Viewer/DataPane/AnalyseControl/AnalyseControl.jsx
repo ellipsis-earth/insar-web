@@ -24,104 +24,65 @@ import DataPaneUtility from '../DataPaneUtility';
 import './AnalyseControl.css';
 import ApiManager from '../../../../ApiManager';
 
-const DEFAULT_SELECTED_CLASS = 'default';
-
 class AnalyseControl extends PureComponent {
 
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      classesLoading: false,
       measurementsLoading: false,
-
-      availableClasses: null,
-      selectedClass: DEFAULT_SELECTED_CLASS,
-
-      classesData: null,
-      measurementsData: {},
-
-      classesExpanded: true,
+      measurementsData: null,
       measurementsExpanded: true,
 
-      maxMask: 1
+      referenceLoading: false,
+      referenceData: null
     };
   }
 
   componentDidMount() {
-    this.setState({ classesLoading: true }, () => {
-      this.getAvailableClasses();
-      this.getData(ViewerUtility.dataGraphType.classes);
-    });
   }
 
   componentDidUpdate(prevProps) {
-    let differentMap = this.props.map !== prevProps.map;
-    if (differentMap) {
-      this.getAvailableClasses();
-    }
+    let element = this.props.element;
+    let referenceElement = this.props.referenceElement;
 
-    if (!this.props.element) {
-      this.setState({ classesData: null, measurementsData: {} });
+    if (!element) {
+      this.setState({ measurementsData: null });
       return;
     }
 
-    let differentElement = differentMap || DataPaneUtility.isDifferentElement(prevProps.element, this.props.element);
+    if (!referenceElement) {
+      this.setState({ referenceData: null });
+    }
 
-    if (differentElement) {
-      this.setState({
-          classesData: null,
-          measurementsData: {},
-          classesLoading: true,
-          measurementsLoading: true,
-        }, () => {
-          this.getData(ViewerUtility.dataGraphType.classes);
-          this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass)
-      });
+    let differentElement = DataPaneUtility.isDifferentElement(prevProps.element, element);
+    let differentReferenceElement = DataPaneUtility.isDifferentElement(prevProps.referenceElement, referenceElement);
+
+    if ((!this.state.measurementsData && !this.state.measurementsLoading) || differentElement) {
+      this.setState({ measurementsData: null, measurementsLoading: true });
+
+      this.getData(this.props.element)
+        .then((data) => {
+          this.setState({ measurementsData: data, measurementsLoading: false });
+        });
+    }
+
+    if ((!this.state.referenceData && !this.state.referenceLoading) || differentReferenceElement) {
+      this.setState({ referenceData: null, referenceLoading: true });
+
+      this.getData(this.props.referenceElement)
+        .then((data) => {
+          console.log('Reference data loaded.');
+          this.setState({ referenceData: data, referenceLoading: false });
+        });
     }
   }
 
-  getAvailableClasses = () => {
-    let availableClasses = [];
-
-    let map = this.props.map;
-
-    if (!map.perClass) {
-      availableClasses.push(ViewerUtility.specialClassName.allClasses);
-    }
-    else {
-      for (let i = 0; i < map.classes.length; i++) {
-        let timestampClasses = map.classes[i];
-
-        for (let x = 0; x < timestampClasses.classes.length; x++) {
-          let className = timestampClasses.classes[x].name;
-
-          if (className === ViewerUtility.specialClassName.outside_area || className === ViewerUtility.specialClassName.mask) {
-            continue;
-          }
-
-          if (!availableClasses.includes(className)) {
-            availableClasses.push(className);
-          }
-        }
-      }
-    }
-
-    // setState with or without callback
-    if (availableClasses.length === 1) {
-      this.setState({ availableClasses: availableClasses }, this.onSelectClass({target : {value: availableClasses[0]}}));
-    }
-    else {
-      this.setState({ availableClasses: availableClasses });
-    }
-  }
-
-  getData = async (type, className) => {
-    let element = this.props.element;
-
+  getData = async (element) => {
     let body = {
       mapId: this.props.map.id,
-      className: className
+      dataType: 'mean_measurement',
+      className: ViewerUtility.specialClassName.allClasses,
     };
 
     if (element.type === ViewerUtility.standardTileLayerType) {
@@ -144,16 +105,9 @@ class AnalyseControl extends PureComponent {
       body.element = element.feature;
     }
 
-    if (type === ViewerUtility.dataGraphType.classes) {
-      body.dataType = 'class';
-    }
-    else if (type === ViewerUtility.dataGraphType.measurements && className !== 'default') {
-      body.dataType = 'mean_measurement';
-    }
-
     let data = {};
 
-    ApiManager.post(`/data/timestamps`, body, this.props.user)
+    return ApiManager.post(`/data/timestamps`, body, this.props.user)
       .then(result => {
         data.raw = result;
 
@@ -172,92 +126,15 @@ class AnalyseControl extends PureComponent {
       .then(result => {
         data.parsed = result;
 
-        if (type === ViewerUtility.dataGraphType.classes) {
-          this.setState({ classesData: data, classesLoading: false });
-        }
-        else if (type === ViewerUtility.dataGraphType.measurements) {
-          let newMeasurementsData = {
-            ...this.state.measurementsData
-          };
-
-          newMeasurementsData[className] = data;
-
-          this.setState({ measurementsData: newMeasurementsData, measurementsLoading: false });
-        }
-      })
-      .catch(err => {
-        let data = null;
-        if (err.status !== 500) {
-          data = {
-            error: true,
-            status: err.status,
-            message: err.message
-          };
-        }        
-
-        if (type === ViewerUtility.dataGraphType.classes) {
-          this.setState({ classesData: data, classesLoading: false });
-        }
-        else if (type === ViewerUtility.dataGraphType.measurements) {
-          let newMeasurementsData = {
-            ...this.state.measurementsData
-          };
-
-          newMeasurementsData[className] = data;
-
-          this.setState({ measurementsData: newMeasurementsData, measurementsLoading: false });
-        }
+        return data;        
       });
-  }
-
-  renderClassOptions = () => {
-    let availableClasses = this.state.availableClasses;
-
-    if (!availableClasses) {
-      return null;
-    }
-
-    let classOptions = [];
-
-    for (let i = 0; i < availableClasses.length; i++) {
-      let className = availableClasses[i];
-
-      classOptions.push(
-        <MenuItem key={className} value={className}>{className}</MenuItem>
-      )
-    }
-
-    return classOptions;
-  }
-
-  onSelectClass = (e) => {
-    let selectedClass = e.target.value;
-
-    if (!this.state.measurementsData[selectedClass]) {
-      this.setState({
-        selectedClass: selectedClass,
-        measurementsLoading: true
-        },
-        () => this.getData(ViewerUtility.dataGraphType.measurements, selectedClass)
-      );
-    }
-    else {
-      this.setState({ selectedClass: selectedClass });
-    }
-  }
-
-  onMaxMaskChange = (e, value) => {
-    this.setState({ maxMask: value });
   }
 
   onDownloadData = (isMeasurements) => {
     let csvData = null;
 
-    if (!isMeasurements && this.state.classesData) {
-      csvData = this.state.classesData.raw;
-    }
-    else if (this.state.measurementsData[this.state.selectedClass]) {
-      csvData = this.state.measurementsData[this.state.selectedClass].raw;
+    if (this.state.measurementsData) {
+      csvData = this.state.measurementsData.raw;
     }
 
     let nameComponents = [this.props.map.name];
@@ -297,7 +174,7 @@ class AnalyseControl extends PureComponent {
     else {
       nameComponents.push(
         'measurements',
-        this.state.selectedClass
+        ViewerUtility.specialClassName.allClasses
       );
     }
 
@@ -312,91 +189,27 @@ class AnalyseControl extends PureComponent {
       return null;
     }
 
-    let classesDataElement = null;
-    let classesData = this.state.classesData;
-    if (!this.state.classesLoading && classesData) {
-      if (!classesData.error) {
-        classesDataElement = 
-          <LineChart
-            map={this.props.map}
-            data={classesData}
-            type={ViewerUtility.dataGraphType.classes}
-            maxMask={this.state.maxMask}
-          />
-      }
-      else {
-        classesDataElement = (<div>{classesData.message}</div>);
-      }
-    }
-
     let measurementsElement = null;
-    let measurementData = this.state.measurementsData[this.state.selectedClass];
+    let measurementData = this.state.measurementsData;
+    let referenceData = this.state.referenceData;
+
     if (!this.state.measurementsLoading && measurementData) {
       if (!measurementData.error) {
         measurementsElement = 
           <LineChart
             map={this.props.map}
             data={measurementData}
+            referenceData={referenceData}
             type={ViewerUtility.dataGraphType.measurements}
-            maxMask={this.state.maxMask}
-          /> 
+          />
       }
       else {
         measurementsElement = (<div>{measurementData.message}</div>);        
       }
-    }    
+    }
 
     return (
       <div>
-        <Card className='data-pane-card'>
-          <CardContent>
-            <div>{'Maximum allowed cloud cover'}: {Math.round(this.state.maxMask * 100)}%</div>
-            <Slider
-              step={0.01}
-              value={this.state.maxMask}
-              min={0}
-              max={1}
-              onChange={this.onMaxMaskChange}
-            />
-          </CardContent>
-        </Card>
-
-        <Card className='data-pane-card'>
-          <CardHeader
-            title={
-              <Typography variant="h6" component="h2" className='no-text-transform'>
-                {'Classes'}
-              </Typography>
-            }
-            action={
-              <IconButton
-                className={this.state.classesExpanded ? 'expand-icon expanded' : 'expand-icon'}
-                onClick={() => this.setState({ classesExpanded: !this.state.classesExpanded })}
-                aria-expanded={this.state.classesExpanded}
-                aria-label='Show'
-              >
-                <ExpandMoreIcon />
-              </IconButton>
-            }
-          />
-          <Collapse in={this.state.classesExpanded}>
-            <CardContent className='data-pane-card-content'>
-              {this.state.classesLoading ? <CircularProgress className='loading-spinner'/> : null}
-              {classesDataElement}
-            </CardContent>
-            {
-              !this.state.classesLoading && classesData && !classesData.error ?
-                <CardActions className='analyse-card-actions'>
-                  <IconButton
-                    onClick={() => this.onDownloadData(false)}
-                    aria-label='Download data'
-                  >
-                    <SaveAlt />
-                  </IconButton>
-                </CardActions> : null
-            }
-          </Collapse>
-        </Card>
         <Card className='data-pane-card'>
           <CardHeader
             title={
@@ -417,23 +230,11 @@ class AnalyseControl extends PureComponent {
           />
           <Collapse in={this.state.measurementsExpanded}>
             <CardContent className='data-pane-card-content analyse-card-content'>
-              {
-                //Render select if needed
-                this.state.availableClasses && this.state.availableClasses.length > 1 ?
-                  <Select
-                    className='class-selector'
-                    value={this.state.selectedClass}
-                    onChange={this.onSelectClass}
-                    disabled={this.state.measurementsLoading}>
-                    <MenuItem value={DEFAULT_SELECTED_CLASS} disabled hidden>{'Select a class'}</MenuItem>
-                    {this.renderClassOptions()}
-                  </Select> : null
-              }
               { this.state.measurementsLoading ? <CircularProgress className='loading-spinner'/> : null }
               {measurementsElement}
             </CardContent>
             {
-              !this.state.measurementsLoading && this.state.measurementsData[this.state.selectedClass] ?
+              !this.state.measurementsLoading && this.state.measurementsData ?
                 <CardActions className='analyse-card-actions'>
                   <IconButton
                     onClick={() => this.onDownloadData(true)}

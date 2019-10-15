@@ -1,0 +1,38 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+src/components/products/products-tutorial/tutorial.php
+src/components/products/products-tutorial/tutorial.md
+src/components/products/products-tutorial/tutorial.json
+src/components/products/products-tutorial/tutorial.html
+src/components/products/products-tutorial/tutorial - Copy.json
+src/components/products/products-tutorial/products-tutorial - Copy.js
+src/components/products/products-tutorial/products-tutorial - Copy.css
+src/components/products/products-tutorial/documentation.json
+src/components/products/products-documentation/products-documentation - Copy.js
+
+build.tar
+src/components/Viewer/TimestampSelector/TimestampSelector - Copy.js
+src/components/Viewer/ViewerMap/ViewerMap - copy.js
+do_publish.sh
+do_publish_dev.sh

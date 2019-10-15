@@ -19,6 +19,7 @@ import './SelectionPane.css';
 import ApiManager from '../../../ApiManager';
 
 const DELETE_CUSTOM_POLYGON_ACTION = 'delete_custom_polygon';
+const AS_REFERENCE_ACTION = 'reference';
 
 class SelectionPane extends PureComponent {
 
@@ -78,6 +79,9 @@ class SelectionPane extends PureComponent {
   onElementActionClick = (action) => {
     if (action === DELETE_CUSTOM_POLYGON_ACTION) {
       this.deleteCustomPolygon();
+    }
+    else if (action === AS_REFERENCE_ACTION) {
+      this.props.onAsReference();
     }
     else {
       this.props.onDataPaneAction(action);
@@ -165,13 +169,26 @@ class SelectionPane extends PureComponent {
           onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.geoMessage)}
           disabled={mapAccessLevel < ApiManager.accessLevels.viewGeoMessages}
         >
-        {'GeoMessage'}
+          {'GeoMessage'}
         </Button>
       ));
     }
 
     if (element.type === ViewerUtility.standardTileLayerType) {
       title = 'Standard tile';
+
+      secondRowButtons.push((
+        <Button
+          key='geoMessage'
+          variant='outlined'
+          size='small'
+          className='selection-pane-button'
+          onClick={() => this.onElementActionClick(AS_REFERENCE_ACTION)}
+          disabled={mapAccessLevel < ApiManager.accessLevels.viewGeoMessages}
+        >
+          As reference
+        </Button>
+      ));
     }
     else if (element.type === ViewerUtility.polygonLayerType) {
       title = 'Polygon';

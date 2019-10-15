@@ -17,7 +17,6 @@ import ViewerUtility from '../../../ViewerUtility';
 
 const NO_DATA_RESULT = 'no data\n';
 const DATE_COLUMN_NAME = 'date_to';
-const AREA_COLUMN_NAME = 'area';
 
 const CLOUD_COVER_COLUMN_INFO = {
   name: 'cloud_cover',
@@ -39,8 +38,7 @@ export class LineChart extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.data !== prevProps.data || this.props.type !== prevProps.type ||
-      this.props.maxMask !== prevProps.maxMask) {
+    if (this.props.data !== prevProps.data || this.props.type !== prevProps.type) {
       let graphElements = this.prepareGraph();
       this.setState({ graphElements: graphElements });
     }
@@ -48,6 +46,7 @@ export class LineChart extends PureComponent {
 
   prepareGraph = () => {
     let data = this.props.data;
+    let referenceData = this.props.referenceData;
     let type = this.props.type;
 
     if (!data || !type) {
@@ -56,6 +55,7 @@ export class LineChart extends PureComponent {
 
     let isMeasurements = type === ViewerUtility.dataGraphType.measurements;
     let parsedData = data.parsed;
+    let parsedReferenceData = referenceData ? referenceData.parsed : null;
 
     if (data.raw === NO_DATA_RESULT || !parsedData || parsedData.data.length === 0) {
       return (
@@ -67,11 +67,7 @@ export class LineChart extends PureComponent {
 
     let columnInfo = null;
 
-    if (!isMeasurements) {
-      let mapClasses = getUniqueLabels(this.props.map.classes, 'classes');
-      columnInfo = mapClasses.filter(x => x.name !== ViewerUtility.specialClassName.noClass && x.name !== ViewerUtility.specialClassName.outside_area);
-    }
-    else if (type === ViewerUtility.dataGraphType.measurements) {
+    if (type === ViewerUtility.dataGraphType.measurements) {
       columnInfo = getUniqueLabels(this.props.map.measurements, 'measurements');
     }
     else {
@@ -103,8 +99,6 @@ export class LineChart extends PureComponent {
     let seriesData = [];
     let dates = [];
 
-    let totalValue = null;
-
     for (let i = 0; i < filteredColumnNames.length; i++ ) {
 
       let columnName = filteredColumnNames[i];
@@ -113,13 +107,10 @@ export class LineChart extends PureComponent {
 
       for (let x = 0; x < parsedData.data.length; x++) {
         let row = parsedData.data[x];
-
-        if (!totalValue) {
-          totalValue = parseFloat(row[AREA_COLUMN_NAME]);
-        }
-
+        let referenceRow = parsedReferenceData ? parsedReferenceData.data[x] : null;
 
         let value = row[columnName];
+        let referenceValue = referenceRow ? referenceRow[columnName] : 0;
         let date = Moment(row[DATE_COLUMN_NAME]).unix() * 1000;
 
         if (!isMeasurements && columnName === ViewerUtility.specialClassName.mask &&
@@ -129,7 +120,7 @@ export class LineChart extends PureComponent {
 
         singleSeriesData.push({
           x: date,
-          y: value
+          y: value - referenceValue
         });
 
         if (!dates.includes(date)) {
@@ -144,32 +135,6 @@ export class LineChart extends PureComponent {
         color: color,
         data: singleSeriesData
       });
-    }
-
-    for (let i = 0; i < dates.length; i++) {
-      let date = dates[i];
-
-      let maskValue = 0;
-
-      for (let y = 0; y < seriesData.length; y++) {
-        let singleSeriesData = seriesData[y];
-
-        let dateData = singleSeriesData.data.find(x => x.x === date);
-
-        if (singleSeriesData.column === ViewerUtility.specialClassName.mask ||
-          singleSeriesData.column === ViewerUtility.specialClassName.cloudCover) {
-          maskValue = dateData.y
-        }
-      }
-
-      let maxMask = this.props.maxMask;
-
-      if (totalValue > 0 && (maskValue / totalValue) > maxMask) {
-        for (let y = 0; y < seriesData.length; y++) {
-          let singleSeriesData = seriesData[y];
-          singleSeriesData.data = singleSeriesData.data.filter(x => x.x !== date);
-        }
-      }
     }
 
     for (let i = 0; i < seriesData.length; i++) {

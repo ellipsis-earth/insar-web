@@ -142,6 +142,7 @@ class DataPane extends PureComponent {
           user={this.props.user}
           map={this.props.map}
           element={this.props.element}
+          referenceElement={this.props.referenceElement}
           home={home}
         />
       );
