@@ -108,6 +108,9 @@ export class MainMenu extends Component {
             <NavLink exact to='/' className='main-menu-logo-item noselect' onClick={() => this.onNavItemClick('home')}>
               <img className='main-menu-logo' src='/images/logos/logo_v2_white_sat.svg' alt='Ellipsis Earth Intelligence'/>
             </NavLink>
+            <span style={{ position: 'relative', top: '7px'}}>
+              INSAR
+            </span>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-navbar-nav' style={{ height: '45px' }} />
           <Navbar.Collapse id='basic-navbar-nav'>
