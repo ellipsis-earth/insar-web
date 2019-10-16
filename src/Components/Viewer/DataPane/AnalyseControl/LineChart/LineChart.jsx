@@ -89,10 +89,6 @@ export class LineChart extends PureComponent {
       });
     }
 
-    if (isMeasurements) {
-      adjustedColumnInfo.push(CLOUD_COVER_COLUMN_INFO);
-    }
-
     let filteredColumnNames = parsedData.meta.fields.filter(x => adjustedColumnInfo.find(y => y.name === x));
 
     let series = [];

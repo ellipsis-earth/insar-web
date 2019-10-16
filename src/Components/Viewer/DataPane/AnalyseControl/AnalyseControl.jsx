@@ -9,9 +9,6 @@ import {
   CardActions,
   Typography,
   CircularProgress,
-  Slider,
-  Select,
-  MenuItem,
   Collapse,
   IconButton,
 } from '@material-ui/core';
@@ -130,24 +127,62 @@ class AnalyseControl extends PureComponent {
       });
   }
 
-  onDownloadData = (isMeasurements) => {
+  onDownloadData = () => {
     let csvData = null;
 
-    if (this.state.measurementsData) {
-      csvData = this.state.measurementsData.raw;
+    let map = this.props.map;
+    let element = this.props.element;
+    let referenceElement = this.props.referenceElement
+
+    let measurementsData = this.state.measurementsData;
+    let referenceData = this.state.referenceData;
+
+    if (measurementsData) {
+      if (referenceData && element.type === ViewerUtility.standardTileLayerType) {
+        let parsedMeasurementsData = measurementsData.parsed;
+        let parsedReferenceData = referenceData.parsed;
+
+        let fields = parsedMeasurementsData.meta.fields;
+
+        let csvArray = [fields];
+
+        for (let i = 0; i < parsedMeasurementsData.data.length; i++) {
+          let measurementsRow = parsedMeasurementsData.data[i];
+          let referenceRow = parsedReferenceData.data[i];
+
+          let csvRowArray = [];
+
+          for (let y = 0; y < fields.length; y++) {
+            let field = fields[y];
+
+            let value = measurementsRow[field];
+
+            if (map.measurements.find(x => x.measurements.find(y => y.name === field))) {
+              value -= referenceRow[field];
+            }
+
+            csvRowArray.push(value);
+          }
+
+          csvArray.push(csvRowArray);
+        }
+        
+        csvData = Papa.unparse(csvArray);
+      }
+      else {
+        csvData = measurementsData.raw;
+      }
     }
 
-    let nameComponents = [this.props.map.name];
-
-    let element = this.props.element;
     let elementProperties = element.feature.properties;
+
+    let nameComponents = [this.props.map.name];
 
     if (element.type === ViewerUtility.standardTileLayerType) {
       nameComponents.push(
         'tile',
         elementProperties.tileX,
-        elementProperties.tileY,
-        elementProperties.zoom
+        elementProperties.tileY
       );
     }
     else if (element.type === ViewerUtility.polygonLayerType) {
@@ -168,15 +203,17 @@ class AnalyseControl extends PureComponent {
       );
     }
 
-    if (!isMeasurements) {
-      nameComponents.push('classes');
-    }
-    else {
+    if (referenceData && element.type === ViewerUtility.standardTileLayerType) {
+      let referenceElementProperties = referenceElement.feature.properties;
+
       nameComponents.push(
-        'measurements',
-        ViewerUtility.specialClassName.allClasses
+        'reference',
+        referenceElementProperties.tileX,
+        referenceElementProperties.tileY
       );
     }
+
+
 
     let fileName = nameComponents.join('_') + '.csv';
 
