@@ -37,12 +37,6 @@ class FlyToControl extends PureComponent {
     };
   }
 
-  componentDidMount() {
-  }
-
-  componentDidUpdate(prevProps) {
-  }
-
   onSelectFlyTo = (e) => {
     let elementIdReset = '';
     let type = e.target.value;
@@ -69,18 +63,6 @@ class FlyToControl extends PureComponent {
       type: this.state.selectedFlyToType,
       elementId: this.state.elementId
     };
-
-    // navigator.geolocation.getCurrentPosition(
-    //   (position) => console.log(`${position.coords.longitude} ${position.coords.latitude}`),
-    //   (err) => {
-    //     console.warn(`Error ${err.code}: ${err.message}`);
-    //     window.postMessage(`Error ${err.code}: ${err.message}`, '*');
-    //     if (window.ReactNativeWebView) {
-    //       window.ReactNativeWebView.postMessage(`Error ${err.code}: ${err.message}`);
-    //     }
-    //   },
-    //   { enableHighAccuracy: true }
-    // );
 
     this.props.onFlyTo(flyToInfo);
   }

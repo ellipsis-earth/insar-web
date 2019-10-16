@@ -560,7 +560,7 @@ class Viewer extends PureComponent {
     };
 
     if (type === ViewerUtility.flyToType.standardTile) {
-      body.elementIds = [{...this.flyToInfo.elementId, zoom: map.aggregationZom }];
+      body.elementIds = [{...this.flyToInfo.elementId, zoom: map.aggregationZoom }];
     }
     else if (type === ViewerUtility.flyToType.polygon) {
       body.elementIds = [this.flyToInfo.elementId];
@@ -598,7 +598,7 @@ class Viewer extends PureComponent {
         this.leafletMap.current.leafletElement.flyTo(this.flyToInfo.target);
       }
       else {
-        this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target, { maxZoom: this.state.map.zoom });
+        this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target, { maxZoom: this.state.map.aggregationZoom - 1 });
       }
 
       if (this.flyToInfo.layer) {
