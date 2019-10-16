@@ -143,7 +143,7 @@ class GeoMessage extends PureComponent {
 
     let body = {
       mapId: this.props.map.id,
-      id: this.props.message.id,
+      messageId: this.props.message.id,
       type: this.props.type
     };
 
