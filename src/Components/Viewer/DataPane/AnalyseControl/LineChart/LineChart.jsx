@@ -93,7 +93,6 @@ export class LineChart extends PureComponent {
 
     let series = [];
     let seriesData = [];
-    let dates = [];
 
     for (let i = 0; i < filteredColumnNames.length; i++ ) {
 
@@ -106,22 +105,18 @@ export class LineChart extends PureComponent {
         let referenceRow = parsedReferenceData ? parsedReferenceData.data[x] : null;
 
         let value = row[columnName];
-        let referenceValue = referenceRow ? referenceRow[columnName] : 0;
+
         let date = Moment(row[DATE_COLUMN_NAME]).unix() * 1000;
 
-        if (!isMeasurements && columnName === ViewerUtility.specialClassName.mask &&
-          row[ViewerUtility.specialClassName.outside_area]) {
-          value += row[ViewerUtility.specialClassName.outside_area];
+        if (columnName === 'displacement') {
+          let referenceValue = referenceRow ? referenceRow[columnName] : 0;
+          value -= referenceValue;
         }
 
         singleSeriesData.push({
           x: date,
-          y: value - referenceValue
+          y: value
         });
-
-        if (!dates.includes(date)) {
-          dates.push(date);
-        }
       }
 
       let color = `#${adjustedColumnInfo.find(y => y.name === columnName).color}`;

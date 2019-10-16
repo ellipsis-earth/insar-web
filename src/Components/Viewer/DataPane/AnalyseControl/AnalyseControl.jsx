@@ -157,7 +157,7 @@ class AnalyseControl extends PureComponent {
 
             let value = measurementsRow[field];
 
-            if (map.measurements.find(x => x.measurements.find(y => y.name === field))) {
+            if (field === 'displacement') {
               value -= referenceRow[field];
             }
 
