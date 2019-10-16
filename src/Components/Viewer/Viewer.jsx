@@ -48,6 +48,7 @@ class Viewer extends PureComponent {
 
   leafletLayers = null;
   selectedElementLayer = null;
+  referenceElementLayer = null;
   drawnPolygonLayer = null;
 
   setNewViewportTimer = null;
@@ -247,6 +248,7 @@ class Viewer extends PureComponent {
 
   onSelectMap = (map) => {
     this.selectedElementLayer = null;
+    this.referenceElementLayer = null;
     this.drawnPolygonLayer = null;
     this.drawnPolygonGeoJson = null;
 
@@ -309,7 +311,39 @@ class Viewer extends PureComponent {
   }
 
   onAsReference = () => {
-    this.setState({ referenceElement: this.state.selectedElement });
+    let geoJson = {
+      type: 'FeatureCollection',
+      count: 1,
+      features: [
+        this.state.selectedElement.feature
+      ]
+    };
+
+    let markerPane = this.leafletMap.current.leafletElement.getPane('markerPane');
+
+    let referenceElementLayer = (
+      <GeoJSON
+        key={Math.random()}
+        data={geoJson}
+        style={ViewerUtility.createGeoJsonLayerStyle('#ff0000', 2, 0.3)}
+        pane={markerPane}
+        onEachFeature={(_, layer) => layer.on({ click: () => {
+          this.selectFeature(
+            ViewerUtility.standardTileLayerType, 
+            this.state.referenceElement.feature, 
+            false
+          );
+        }})
+        }
+      />
+    );
+
+    this.referenceElementLayer = referenceElementLayer;
+
+    this.setState(
+      { referenceElement: this.state.selectedElement }, 
+      () => { this.rebuildAllLayers(); }
+    );
   }
 
   selectFeature = (type, feature, hasAggregatedData, color, cb) => {
@@ -398,6 +432,7 @@ class Viewer extends PureComponent {
     let allLayers = [
       this.leafletLayers,
       this.state.overrideLeafletLayers,
+      this.referenceElementLayer,
       this.selectedElementLayer,
       this.drawnPolygonLayer,
     ];

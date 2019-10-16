@@ -59,6 +59,7 @@ const tileLayerTypes = [
   }
 ];
 
+const DEFAULT_SELECTED_LAYERS = [BASE_SATELLITE_LAYER_NAME, 'interferogram'];
 
 class TileLayersControl extends PureComponent {
 
@@ -160,13 +161,7 @@ class TileLayersControl extends PureComponent {
     for (let i = 0; i < availableLayers.length; i++) {
       let availableLayer = availableLayers[i];
 
-      let tileLayerType = tileLayerTypes.find(x => x.name === availableLayer.type);
-
-      if (!tileLayerType) {
-        continue;
-      }
-
-      if (tileLayerType.defaultSelected) {
+      if (DEFAULT_SELECTED_LAYERS.includes(availableLayer.name)) {
         selectedLayers.push(availableLayer);
       }
     }

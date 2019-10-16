@@ -182,11 +182,11 @@ class SelectionPane extends PureComponent {
           key='geoMessage'
           variant='outlined'
           size='small'
-          className='selection-pane-button'
+          className='selection-pane-button selection-pane-button-single'
           onClick={() => this.onElementActionClick(AS_REFERENCE_ACTION)}
           disabled={mapAccessLevel < ApiManager.accessLevels.viewGeoMessages}
         >
-          As reference
+          As altitude reference
         </Button>
       ));
     }

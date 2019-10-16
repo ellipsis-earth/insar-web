@@ -31,8 +31,15 @@ div.specific-actions {
 button.selection-pane-button {
   color: #026464;
   width: 42%;
-  margin-right: 18px;
+  margin-right: 4%;
+  margin-left: 4%;
   margin-bottom: 8px;
+}
+
+button.selection-pane-button-single {
+  width: 92%;
+  margin-right: 0%;
+  margin-left: 0%;
 }
 
 .no-text-transform {

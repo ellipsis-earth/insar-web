@@ -67,7 +67,7 @@ class AnalyseControl extends PureComponent {
         });
     }
 
-    if ((!this.state.referenceData && !this.state.referenceLoading) || differentReferenceElement) {
+    if ((this.props.referenceElement && !this.state.referenceData && !this.state.referenceLoading) || differentReferenceElement) {
       this.setState({ referenceData: null, referenceLoading: true });
 
       this.getData(this.props.referenceElement)
@@ -210,6 +210,15 @@ class AnalyseControl extends PureComponent {
 
     return (
       <div>
+        {
+          !this.props.referenceElement ? 
+            <Card className='data-pane-card'>
+              <CardHeader
+                className='data-pane-title-header'
+                subheader={'Warning: No reference tile selected.'}
+              />
+            </Card> : null
+        }
         <Card className='data-pane-card'>
           <CardHeader
             title={

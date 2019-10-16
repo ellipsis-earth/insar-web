@@ -3,13 +3,10 @@ import React, { PureComponent } from 'react';
 import ApiManager from '../../../../ApiManager';
 import ErrorHandler from '../../../../ErrorHandler';
 
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-
 import './MapSelector.css';
 import ViewerUtility from '../../ViewerUtility';
 
-const ADMIN_ATLAS = 'Development';
+const INSAR_MAP_ID = 'cee513c0-37dc-4836-af40-51adb06b6c76';
 
 const METADATA_TYPES = [
   { key: 'timestamps', function: (map, result) => { map.timestamps = result; } },
@@ -28,10 +25,8 @@ export class MapSelector extends PureComponent {
     this.state = {
       maps: [],
 
-      atlasSelect: null,
       mapselect: null,
 
-      selectedAtlas: 'default',
       selectedMap: { id: 'default' },
     };
   }
@@ -40,8 +35,6 @@ export class MapSelector extends PureComponent {
     if (this.props.user !== prevProps.user) {
       this.getMaps();
     }
-
-
   }
 
   componentDidMount = () => {
@@ -53,39 +46,13 @@ export class MapSelector extends PureComponent {
       .then(maps => {
         maps.sort((a, b) => { return a.name.localeCompare(b.name); });
 
-        let urlSelectedMapName = new URLSearchParams(window.location.search).get('map');
-
-        let urlSelectedMap = maps.find(x => x.name === urlSelectedMapName);
-
-        let selectedAtlas = this.state.selectedAtlas;
-        if (urlSelectedMap) {
-          if (urlSelectedMap.atlases.length > 0) {
-            selectedAtlas = urlSelectedMap.atlases[0];
-          }
-          else {
-            selectedAtlas = ADMIN_ATLAS;
-          }
-        }
-
-        this.setState({ maps: maps, selectedAtlas: selectedAtlas }, () => {
-          if (urlSelectedMap) {
-            this.onSelectMap({ target: { value: urlSelectedMap.id } })
-          }
+        this.setState({ maps: maps }, () => {
+          this.onSelectMap({ target: { value: INSAR_MAP_ID } });
         });
       })
       .catch(err => {
         ErrorHandler.alert(err);
       });
-  }
-
-  onSelectAtlas = (e) => {
-    let atlas = e.target.value;
-
-    if (this.state.selectedAtlas === atlas) {
-      return;
-    }
-
-    this.setState({ selectedAtlas: atlas, selectedMap: { id: 'default' }});
   }
 
   onSelectMap = (e) => {
@@ -107,7 +74,6 @@ export class MapSelector extends PureComponent {
           this.props.onSelectMap(map);
         })
         .catch(err => {
-          debugger;
           ErrorHandler.alert(err);
         });
     }
@@ -143,107 +109,8 @@ export class MapSelector extends PureComponent {
       });
   }
 
-  renderAtlasSelect = () => {
-    let maps = this.state.maps;
-
-    if (!maps || maps.length === 0) {
-      return null;
-    }
-
-    let options = [];
-
-    let atlases = [];
-    let atlasMapCount = {};
-
-    for (let i = 0; i < maps.length; i++) {
-      let map = maps[i];
-
-      if (!map.atlases) {
-        continue;
-      }
-
-      for (let x = 0; x < map.atlases.length; x++) {
-        let atlas = map.atlases[x];
-
-        if (!atlases.includes(atlas)) {
-          atlases.push(atlas);
-        }
-
-        if (!atlasMapCount[atlas]) {
-          atlasMapCount[atlas] = 1;
-        }
-        else {
-          atlasMapCount[atlas] += 1;
-        }
-      }
-    }
-
-    atlases.sort((a, b) => {
-      return a.toLowerCase().localeCompare(b.toLowerCase());
-    });
-
-    let user = this.props.user;
-
-    if (user && (user.username === ViewerUtility.admin || user.username === 'demo_user' || user.username === 'minghai')) {
-      atlases.push(ADMIN_ATLAS);
-      atlasMapCount[ADMIN_ATLAS] = maps.length;
-    }
-
-    for (let i = 0; i < atlases.length; i++) {
-      options.push(
-        <MenuItem value={atlases[i]} key={i}>{`${atlases[i]} (${atlasMapCount[atlases[i]]})`}</MenuItem>
-      );
-    }
-
-    let atlasSelect = (
-      <Select className='selector map-selector-select' onChange={this.onSelectAtlas} value={this.state.selectedAtlas}>
-        <MenuItem value='default' disabled hidden>{'Select an Atlas'}</MenuItem>
-        {options}
-      </Select>
-    );
-
-    return atlasSelect;
-  }
-
-  renderMapSelect = () => {
-    let maps = this.state.maps;
-    let selectedAtlas = this.state.selectedAtlas;
-
-    if (!maps || !selectedAtlas || selectedAtlas === 'default') {
-      return null;
-    }
-
-    let mapsOfAtlas = maps;
-    if (selectedAtlas !== ADMIN_ATLAS) {
-      mapsOfAtlas = maps.filter(x => x.atlases.includes(selectedAtlas));
-    }
-
-    let options = [];
-
-    for (let i = 0; i < mapsOfAtlas.length; i++) {
-      let map = mapsOfAtlas[i];
-      options.push(
-        <MenuItem value={map.id} key={i}>{map.name}</MenuItem>
-      );
-    }
-
-    let mapSelect = (
-      <Select className='selector' onChange={this.onSelectMap} value={this.state.selectedMap.id}>
-        <MenuItem value='default' disabled hidden>{'Select a map'}</MenuItem>
-        {options}
-      </Select>
-    )
-
-    return mapSelect;
-  };
-
   render() {
-    return (
-      <div>
-        {this.renderAtlasSelect()}
-        {this.renderMapSelect()}
-      </div>
-    );
+    return null;
   }
 }
 
