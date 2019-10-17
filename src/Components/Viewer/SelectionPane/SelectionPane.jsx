@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import Papa from 'papaparse';
 
 import {
   Card,
@@ -37,8 +38,47 @@ class SelectionPane extends PureComponent {
       this.setState({ isOpen: false });
     }
     else if (prevProps.element !== this.props.element) {
-      this.setState({ isOpen: true });
+      this.setState({ isOpen: true, altitude: null });
+      this.getAltitude();
     }
+  }
+
+  getAltitude = () => {
+    let element = this.props.element;
+    let type = element.type;
+    let feature = element.feature;
+
+    let body = {
+      mapId: this.props.map.altitudeMap.id,
+      type: type,
+      element: {
+        tileX: feature.properties.tileX,
+        tileY: feature.properties.tileY,
+        zoom: feature.properties.zoom
+      },
+      dataType: 'mean_measurement',
+      className: 'all classes'
+    };
+    return ApiManager.post(`/data/timestamps`, body, this.props.user)
+      .then(result => {
+        let parseFunc = async () => {
+          let parsedData = Papa.parse(result, {
+            dynamicTyping: true,
+            skipEmptyLines: true,
+            header: true
+          });
+
+          return parsedData;
+        };
+
+        return parseFunc();
+      })
+      .then(result => {
+        let altitude = result.data[0]['altitude'];
+        
+        this.setState({ altitude: altitude });
+      });
+
   }
 
   open = () => {
@@ -246,6 +286,17 @@ class SelectionPane extends PureComponent {
     let elementProperties = element.feature.properties;
     let properties = [];
 
+    if (element.type === ViewerUtility.standardTileLayerType) {
+      let altitudeText = this.state.altitude !== undefined && this.state.altitude !== null ? 
+        this.state.altitude : 'loading...' ;
+
+      properties.push((
+        <div key='altitude'>
+          {`altitude: ${altitudeText}`}
+        </div>
+      ));
+    }
+    
     let selectionPaneClass = 'selection-pane';
 
     for (let property in elementProperties) {
