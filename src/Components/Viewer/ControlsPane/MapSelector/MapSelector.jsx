@@ -3,10 +3,16 @@ import React, { PureComponent } from 'react';
 import ApiManager from '../../../../ApiManager';
 import ErrorHandler from '../../../../ErrorHandler';
 
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+
 import './MapSelector.css';
 import ViewerUtility from '../../ViewerUtility';
 
-const INSAR_MAP_ID = 'cee513c0-37dc-4836-af40-51adb06b6c76';
+const INSAR_ATLAS = 'InSAR';
+
+const ALTITUDE_TYPE = 'altitude';
+const INSAR_TYPE = 'insar';
 
 const METADATA_TYPES = [
   { key: 'timestamps', function: (map, result) => { map.timestamps = result; } },
@@ -25,8 +31,10 @@ export class MapSelector extends PureComponent {
     this.state = {
       maps: [],
 
+      atlasSelect: null,
       mapselect: null,
 
+      selectedAtlas: 'default',
       selectedMap: { id: 'default' },
     };
   }
@@ -44,29 +52,29 @@ export class MapSelector extends PureComponent {
   getMaps = async () => {
     ApiManager.get('/account/myMaps', null, this.props.user)
       .then(maps => {
+        maps = maps.filter(x => x.atlases.includes(INSAR_ATLAS));
         maps.sort((a, b) => { return a.name.localeCompare(b.name); });
 
-        this.setState({ maps: maps }, () => {
-          this.onSelectMap({ target: { value: INSAR_MAP_ID } });
-        });
+        this.setState({ maps: maps });
       })
       .catch(err => {
         ErrorHandler.alert(err);
       });
   }
 
-  onSelectMap = (e) => {
-    if (!e.target.value) {
+  onSelectAtlas = (e) => {
+    let atlas = e.target.value;
+
+    if (this.state.selectedAtlas === atlas) {
       return;
     }
 
-    let map = this.state.maps.find(x => x.id === e.target.value);
+    let map = this.state.maps.find(x => x.info.subatlas === atlas && x.info.type === INSAR_TYPE);
+    let altitudeMap = this.state.maps.find(x => x.info.subatlas === atlas && x.info.type === ALTITUDE_TYPE);
 
-    if (!map) {
-      return;
-    }
+    map.altitudeMap = altitudeMap;
 
-    this.setState({ selectedMap: map });
+    this.setState({ selectedAtlas: atlas, selectedMap: map });    
 
     if (!map.timestamps || !map.layer) {
       this.getMapMetadata(map)
@@ -77,7 +85,7 @@ export class MapSelector extends PureComponent {
           ErrorHandler.alert(err);
         });
     }
-  };
+  }
 
   getMapMetadata = (map) => {
     if (map.metadataLoaded) {
@@ -109,8 +117,57 @@ export class MapSelector extends PureComponent {
       });
   }
 
+  renderAtlasSelect = () => {
+    let maps = this.state.maps;
+
+    if (!maps || maps.length === 0) {
+      return null;
+    }
+
+    let options = [];
+
+    let atlases = [];
+
+    for (let i = 0; i < maps.length; i++) {
+      let map = maps[i];
+
+      if (!map.info) {
+        continue;
+      }
+
+      let atlas = map.info.subatlas;
+
+      if (!atlases.includes(atlas)) {
+        atlases.push(atlas);
+      }      
+    }
+
+    atlases.sort((a, b) => {
+      return a.toLowerCase().localeCompare(b.toLowerCase());
+    });
+
+    for (let i = 0; i < atlases.length; i++) {
+      options.push(
+        <MenuItem value={atlases[i]} key={i}>{`${atlases[i]}`}</MenuItem>
+      );
+    }
+
+    let atlasSelect = (
+      <Select className='selector map-selector-select' onChange={this.onSelectAtlas} value={this.state.selectedAtlas}>
+        <MenuItem value='default' disabled hidden>{'Select an Atlas'}</MenuItem>
+        {options}
+      </Select>
+    );
+
+    return atlasSelect;
+  }
+
   render() {
-    return null;
+    return (
+      <div>
+        {this.renderAtlasSelect()}
+      </div>
+    );
   }
 }
 
