@@ -158,7 +158,7 @@ class AnalyseControl extends PureComponent {
             let value = measurementsRow[field];
 
             if (field === 'displacement') {
-              value = referenceRow[field] - value;
+              value = value - referenceRow[field];
             }
 
             csvRowArray.push(value);
