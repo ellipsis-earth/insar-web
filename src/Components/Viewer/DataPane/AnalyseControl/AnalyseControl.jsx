@@ -78,7 +78,7 @@ class AnalyseControl extends PureComponent {
   getData = async (element) => {
     let body = {
       mapId: this.props.map.id,
-      dataType: 'mean_measurement',
+      dataType: ViewerUtility.dataType.meanMeasurement,
       className: ViewerUtility.specialClassName.allClasses,
     };
 

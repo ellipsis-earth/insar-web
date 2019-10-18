@@ -56,7 +56,7 @@ class SelectionPane extends PureComponent {
         tileY: feature.properties.tileY,
         zoom: feature.properties.zoom
       },
-      dataType: 'mean_measurement',
+      dataType: ViewerUtility.dataType.meanMeasurement,
       className: 'all classes'
     };
     return ApiManager.post(`/data/timestamps`, body, this.props.user)

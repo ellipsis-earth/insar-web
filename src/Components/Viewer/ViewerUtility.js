@@ -5,7 +5,7 @@ import { isAndroid, isIOS, isMobile } from 'react-device-detect';
 const TILE = 'image_tile';
 const STANDARD_TILE = 'tile';
 const POLYGON = 'polygon';
-const CUSTOM_POLYGON = 'custom_polygon'
+const CUSTOM_POLYGON = 'customPolygon';
 
 const ViewerUtility = {
 
@@ -15,6 +15,12 @@ const ViewerUtility = {
   standardTileLayerType: STANDARD_TILE,
   polygonLayerType: POLYGON,
   customPolygonTileLayerType: CUSTOM_POLYGON,
+
+  dataType: {
+    class: 'class',
+    meanMeasurement: 'meanMeasurement',
+    deviationMeasurement: 'deviationMeasurement'
+  },
 
   drawnPolygonLayerType: 'drawn_polygon',
 
