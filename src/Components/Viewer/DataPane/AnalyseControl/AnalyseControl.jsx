@@ -37,11 +37,14 @@ class AnalyseControl extends PureComponent {
   }
 
   componentDidMount() {
+    this.forceUpdate();
   }
 
   componentDidUpdate(prevProps) {
     let element = this.props.element;
     let referenceElement = this.props.referenceElement;
+
+    debugger;
 
     if (!element) {
       this.setState({ measurementsData: null });
@@ -54,6 +57,7 @@ class AnalyseControl extends PureComponent {
 
     let differentElement = ViewerUtility.isDifferentElement(prevProps.element, element);
     let differentReferenceElement = ViewerUtility.isDifferentElement(prevProps.referenceElement, referenceElement);
+
 
     if ((!this.state.measurementsData && !this.state.measurementsLoading) || differentElement) {
       this.setState({ measurementsData: null, measurementsLoading: true });
