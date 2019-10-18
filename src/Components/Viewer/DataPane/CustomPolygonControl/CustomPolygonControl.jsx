@@ -18,7 +18,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
-import DataPaneUtility from '../DataPaneUtility';
 
 import './CustomPolygonControl.css';
 import ApiManager from '../../../../ApiManager';

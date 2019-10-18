@@ -119,6 +119,7 @@ class ControlsPane extends PureComponent {
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
+          referenceElement={this.props.referenceElement}
           override={this.props.override}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.standardTileLayerType, layers)}
           onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.standardTileLayerType, feature, true)}

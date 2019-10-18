@@ -638,6 +638,7 @@ class Viewer extends PureComponent {
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
             leafletMapViewport={this.state.leafletMapViewport}
             timestampRange={this.state.timestampRange}
+            referenceElement={this.state.referenceElement}
             geolocation={this.state.geolocation}
             override={this.state.overrideLeafletLayers ? true : false}
             onSelectMap={this.onSelectMap}

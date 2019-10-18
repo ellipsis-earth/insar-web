@@ -110,7 +110,7 @@ export class LineChart extends PureComponent {
 
         if (columnName === 'displacement') {
           let referenceValue = referenceRow ? referenceRow[columnName] : 0;
-          value -= referenceValue;
+          value = referenceValue - value;
         }
 
         singleSeriesData.push({

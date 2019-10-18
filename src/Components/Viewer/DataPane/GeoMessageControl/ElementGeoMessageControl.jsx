@@ -6,7 +6,6 @@ import {
 } from '@material-ui/core';
 
 import ViewerUtility from '../../ViewerUtility';
-import DataPaneUtility from '../DataPaneUtility';
 
 import './GeoMessageControl.css';
 import ApiManager from '../../../../ApiManager';
@@ -46,7 +45,7 @@ class ElementGeoMessageControl extends PureComponent {
 
   componentDidUpdate(prevProps) {
     let differentMap = this.props.map !== prevProps.map;
-    let differentElement = DataPaneUtility.isDifferentElement(prevProps.element, this.props.element);
+    let differentElement = ViewerUtility.isDifferentElement(prevProps.element, this.props.element);
 
     let update = false;
 

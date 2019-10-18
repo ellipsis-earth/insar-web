@@ -21,7 +21,6 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 
 import Utility from '../../../../../Utility';
 import ViewerUtility from '../../../ViewerUtility';
-import DataPaneUtility from '../../DataPaneUtility';
 
 import './GeoMessage.css';
 import ApiManager from '../../../../../ApiManager';

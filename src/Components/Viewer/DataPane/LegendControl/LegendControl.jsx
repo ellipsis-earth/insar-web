@@ -18,7 +18,6 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
-import DataPaneUtility from '../DataPaneUtility';
 
 import './LegendControl.css';
 import ApiManager from '../../../../ApiManager';

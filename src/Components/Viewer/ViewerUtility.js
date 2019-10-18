@@ -69,6 +69,32 @@ const ViewerUtility = {
     customPolygon: CUSTOM_POLYGON
   },
 
+  isDifferentElement: (prevElement, curElement) => {
+    if (!curElement) {
+      return false;
+    }
+
+    let differentElement = !prevElement || prevElement.type !== curElement.type;
+
+    if (!differentElement) {
+      // Same map, same type. Compare ids.
+
+      let prevFeatureInfo = prevElement.feature.properties;
+      let curFeatureInfo = curElement.feature.properties;
+
+      if (curElement.type === STANDARD_TILE) {
+        differentElement = prevFeatureInfo.tileX !== curFeatureInfo.tileX ||
+          prevFeatureInfo.tileY !== curFeatureInfo.tileY ||
+          prevFeatureInfo.zoom !== curFeatureInfo.zoom;
+      }
+      else {
+        differentElement = prevFeatureInfo.id !== curFeatureInfo.id;
+      }
+    }
+
+    return differentElement;
+  },
+
   download: (fileName, text, mime) => {
     if (isMobile && isAndroid) {
       const fileStream = streamSaver.createWriteStream(fileName);

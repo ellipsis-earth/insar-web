@@ -22,7 +22,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import ViewerUtility from '../../ViewerUtility';
-import DataPaneUtility from '../DataPaneUtility';
 
 import './GeoMessageControl.css';
 import ApiManager from '../../../../ApiManager';
@@ -158,7 +157,7 @@ class FeedGeoMessageControl extends PureComponent {
   }
 
   getNextPage = () => {
-    if (this.feedPage * PAGE_SIZE > this.geoMessageIds.length) {
+    if (this.feedPage * PAGE_SIZE >= this.geoMessageIds.length) {
       return Promise.resolve();
     }
 

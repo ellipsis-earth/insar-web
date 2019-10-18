@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
+import Papa from 'papaparse';
 
 import {
   Card,
@@ -8,6 +9,7 @@ import {
   CardContent,
   Collapse,
   IconButton,
+  Slider,
   Typography
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -19,11 +21,18 @@ import ViewerUtility from '../../ViewerUtility';
 import './StandardTileLayersControl.css';
 
 import ApiManager from '../../../../ApiManager';
+import Viewer from '../../Viewer';
 
 const STANDARD_TILES_LAYERS_DISPLAY_NAME = 'standard tiles';
+const ALTITUDE_CHANGE = 'altitude change';
+
 const STANDARD_TILES_LAYER = {
   type: STANDARD_TILES_LAYERS_DISPLAY_NAME,
   name: STANDARD_TILES_LAYERS_DISPLAY_NAME
+};
+const ALTITUDE_CHANGE_LAYER = {
+  type: ALTITUDE_CHANGE,
+  name: ALTITUDE_CHANGE
 };
 
 const MAX_TILES = 500;
@@ -31,6 +40,9 @@ const MAX_TILES = 500;
 class StandardTileLayersControl extends PureComponent {
 
   standardTilesGeoJson = null
+  altitudeTilesGeoJson = null
+
+  onDownloadTimer = null
 
   constructor(props, context) {
     super(props, context);
@@ -43,7 +55,9 @@ class StandardTileLayersControl extends PureComponent {
 
       expanded: true,
 
-      count: null
+      count: {},
+
+      altitudeThreshold: 0
     };
   }
 
@@ -69,21 +83,45 @@ class StandardTileLayersControl extends PureComponent {
       this.props.leafletMapViewport.bounds.yMin !== prevProps.leafletMapViewport.bounds.yMin ||
       this.props.leafletMapViewport.bounds.yMax !== prevProps.leafletMapViewport.bounds.yMax;
 
-    if (differentMap || differentTimestamp || differentBounds) {
+    let referenceElement = this.props.referenceElement;
+    if (!referenceElement && !this.state.referenceError) {
+      this.setState({ referenceError: 'Select a refence tile for change comparison' });
+    }
 
+    let differentReferenceElement = ViewerUtility.isDifferentElement(prevProps.referenceElement, referenceElement);
+
+    if ((this.props.referenceElement && this.state.referenceData === undefined && !this.state.referenceLoading) || differentReferenceElement) { 
+      this.setState({ referenceData: null });
+
+      this.getData(this.props.referenceElement)
+        .then((data) => {
+          if (data === null) {
+            this.setState({ referenceData: 0, referenceError: 'Reference tile has no displacement geomessage'});
+          }
+          else {
+            this.setState({ referenceData: data, referenceError: null }, () => {
+              this.prepareLayers(this.props.map, this.props.timestampRange, this.state.selectedLayers)
+                .then(leafletLayers => {
+                  this.props.onLayersChange(leafletLayers);
+                });
+            });
+          }
+        });
+    }
+    else if (differentMap || differentTimestamp || differentBounds) {
       let availableLayers = this.state.availableLayers;
       let selectedLayers = this.state.selectedLayers;
 
       if (differentMap) {
 
-        availableLayers = [STANDARD_TILES_LAYER];
+        availableLayers = [STANDARD_TILES_LAYER, ALTITUDE_CHANGE_LAYER];
         selectedLayers = [];
 
         this.standardTilesGeoJson = null;
         this.setState({
           availableLayers: availableLayers,
           selectedLayers: selectedLayers,
-          count: null
+          count: {}
         });
       }
 
@@ -109,23 +147,24 @@ class StandardTileLayersControl extends PureComponent {
     let selectedLayers = this.state.selectedLayers;
 
     for (let i = 0; i < availableLayers.length; i++) {
-
       let availableLayer = availableLayers[i];
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
       let counter = null;
-      if (checked && this.state.count !== null) {
+      let count = this.state.count[availableLayer.name];
+
+      if (checked && count !== undefined) {
         let className = '';
         let downloadButton = null;
 
-        if (this.state.count > MAX_TILES) {
+        if (count > MAX_TILES) {
           className = 'geometry-limit-exceeded';
         }
         else {
           downloadButton = (
             <IconButton
               className='download-geometry-button'
-              onClick={() => this.onDownload()}
+              onClick={() => this.onDownload(availableLayer.name)}
             >
               <SaveAlt className='download-geometry-button-icon'/>
             </IconButton>
@@ -134,7 +173,7 @@ class StandardTileLayersControl extends PureComponent {
 
         counter = (
           <span className='geometry-counter'>
-            <span className={className}>{this.state.count}</span>
+            <span className={className}>{count}</span>
             <span>/{MAX_TILES}</span>
             {downloadButton}
           </span>
@@ -166,10 +205,20 @@ class StandardTileLayersControl extends PureComponent {
   }
 
   prepareLayers = async (map, timestampRange, selectedLayers) => {
-    if (!selectedLayers.includes(STANDARD_TILES_LAYER)) {
-      return;
+    let promises = [];
+
+    if (selectedLayers.includes(STANDARD_TILES_LAYER)) {
+      promises.push(this.prepareStandardTileLayer(map, timestampRange));
+    }   
+
+    if (selectedLayers.includes(ALTITUDE_CHANGE_LAYER)) {
+      promises.push(this.prepareAltitudeChange(map, timestampRange));
     }
 
+    return Promise.all(promises);
+  }
+
+  prepareStandardTileLayer = async (map, timestampRange) => {
     let bounds = this.props.leafletMapViewport.bounds;
 
     let body =  {
@@ -186,7 +235,9 @@ class StandardTileLayersControl extends PureComponent {
 
     let leafletGeojsonLayer = await ApiManager.post('/geometry/ids', body, this.props.user)
       .then(standardTileIds => {
-        this.setState({ count: standardTileIds.count });
+        let count = {...count};
+        count[STANDARD_TILES_LAYER.name] = standardTileIds.count
+        this.setState({ count: count });
 
         if (!standardTileIds || standardTileIds.count === 0 || standardTileIds.count > MAX_TILES) {
           this.standardTilesGeoJson = null;
@@ -225,6 +276,166 @@ class StandardTileLayersControl extends PureComponent {
       });
 
     return leafletGeojsonLayer;
+  }
+
+  prepareAltitudeChange = async (map, timestampRange) => {
+    let bounds = this.props.leafletMapViewport.bounds;
+
+    let body =  {
+      mapId: map.id,
+      type: ViewerUtility.standardTileLayerType,
+      timestamp: map.timestamps[timestampRange.end].timestampNumber,
+      xMin: bounds.xMin,
+      xMax: bounds.xMax,
+      yMin: bounds.yMin,
+      yMax: bounds.yMax,
+      zoom: map.aggregationZoom
+    };
+
+    body = {
+      mapId: map.id,
+      type: ViewerUtility.standardTileLayerType,
+      filters: {
+        forms: ['displacement'],
+        bounds: bounds
+      }
+    };
+
+    let threshold = this.state.altitudeThreshold;
+
+    let leafletGeojsonLayer = ApiManager.post('/geoMessage/ids', body, this.props.user)
+      .then((geoMessages) => {
+        if (!geoMessages || geoMessages.messages.length === 0 || geoMessages.messages.length > MAX_TILES) {
+          let count = {...count};
+          count[ALTITUDE_CHANGE_LAYER.name] = geoMessages.messages.length;
+          this.setState({ count: count });
+  
+          return null;
+        }
+
+        let uniqueTiles = [];
+        for (let i = 0; i < geoMessages.length; i++) {
+          let tileId = geoMessages[i].elementId;
+
+          if (!uniqueTiles.find(x => x.tileX === tileId.tileX && x.tileY === tileId.tileY && x.zoom === tileId.zoom)) {
+            uniqueTiles.push(tileId);
+          }
+        }        
+
+        body = {
+          mapId: map.id,
+          type: ViewerUtility.standardTileLayerType,
+          messageIds: geoMessages.messages.map(x => x.id)
+        };
+
+        return ApiManager.post('/geoMessage/get', body, this.props.user);  
+      })
+      .then((geoMessages) => {
+        if (!geoMessages) {
+          return null;
+        }
+
+        let referenceAltitude = this.state.referenceData;
+
+        let uniqueTiles = [];
+        for (let i = 0; i < geoMessages.length; i++) {
+          let geoMessage = geoMessages[i];
+
+          if (!this.state.referenceError) {
+            let altitude = geoMessage.form.answers[0].answer;
+
+            let diff = altitude - referenceAltitude;
+  
+            if (diff > threshold) {
+              continue;
+            }  
+          }         
+
+          let tileId = geoMessage.elementId;
+
+          if (!uniqueTiles.find(x => x.tileX === tileId.tileX && x.tileY === tileId.tileY && x.zoom === tileId.zoom)) {
+            uniqueTiles.push(tileId);
+          }
+        }
+
+        let count = {...this.state.count};
+        count[ALTITUDE_CHANGE_LAYER.name] = uniqueTiles.length;
+        this.setState({ count: count });
+
+        if (uniqueTiles.length > 0 && uniqueTiles.length < MAX_TILES) {  
+          body = {
+            mapId: map.id,
+            type: ViewerUtility.standardTileLayerType,
+            elementIds: uniqueTiles
+          };
+  
+          return ApiManager.post('/geometry/get', body, this.props.user);
+        }
+        else {
+          return null;
+        }
+      })
+      .then(altitudeTilesGeoJson => {
+        if (!altitudeTilesGeoJson) {
+          this.altitudeTilesGeoJson = null;
+          return null;
+        }
+
+        this.altitudeTilesGeoJson = {
+          geoJson: altitudeTilesGeoJson,
+          bounds: bounds
+        };
+
+        return (
+          <GeoJSON
+            key={Math.random()}
+            data={altitudeTilesGeoJson}
+            style={ViewerUtility.createGeoJsonLayerStyle('cornflowerblue')}
+            zIndex={ViewerUtility.standardTileLayerZIndex + 1}
+            onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
+          />
+        );
+      });
+
+    return leafletGeojsonLayer;
+  }
+
+  getData = async (element) => {
+    let properties = element.feature.properties;
+
+    let body = {
+      mapId: this.props.map.id,
+      type: ViewerUtility.standardTileLayerType,
+      filters: {
+        tileIds: [{ tileX: properties.tileX, tileY: properties.tileY, zoom: properties.zoom }],
+        forms: ['displacement']
+      }
+    };
+
+    return ApiManager.post(`/geomessage/ids`, body, this.props.user)
+      .then((geoMessages) => {
+
+        if (geoMessages.messages.length === 0) {
+          return null;
+        }
+
+        let geoMessageIds = geoMessages.messages.map(x => x.id);
+
+        body.messageIds = geoMessageIds;
+
+        return ApiManager.post('/geomessage/get', body, this.props.user)
+      })
+      .then((geoMessages) => {
+        if (geoMessages === null) {
+          return null;
+        }
+
+        let lastGeoMessage = geoMessages[geoMessages.length - 1];
+
+        let altitude = lastGeoMessage.form.answers[0].answer;
+
+        return altitude;
+      });
   }
 
   onLayerChange = (e) => {
@@ -268,12 +479,21 @@ class StandardTileLayersControl extends PureComponent {
     this.props.onFeatureClick(feature);
   }
 
-  onDownload = () => {
-    if (!this.standardTilesGeoJson) {
+  onDownload = (layerName) => {
+    let geoJson = null;
+
+    if (layerName === STANDARD_TILES_LAYER.name) {
+      geoJson = this.standardTilesGeoJson;
+    }
+    else if (layerName === ALTITUDE_CHANGE_LAYER.name) {
+      geoJson = this.altitudeTilesGeoJson;
+    }
+
+    if (!geoJson) {
       return;
     }
 
-    let bounds = this.standardTilesGeoJson.bounds;
+    let bounds = geoJson.bounds;
 
     let decimals = 4;
 
@@ -288,7 +508,20 @@ class StandardTileLayersControl extends PureComponent {
 
     let fileName = nameComponents.join('_') + '.geojson';
 
-    ViewerUtility.download(fileName, JSON.stringify(this.standardTilesGeoJson.geoJson), 'application/json');
+    ViewerUtility.download(fileName, JSON.stringify(geoJson.geoJson), 'application/json');
+  }
+
+  onSlide = (_, v) => {
+    this.setState({ altitudeThreshold: v}, () => {
+      clearTimeout(this.onDownloadTimer);
+
+      this.onDownloadTimer = setTimeout(() => {
+        this.prepareLayers(this.props.map, this.props.timestampRange, this.state.selectedLayers)
+          .then(standardTilesLayers => {
+            this.props.onLayersChange(standardTilesLayers);
+          });
+      }, 1000);
+    });
   }
 
   render() {
@@ -325,6 +558,22 @@ class StandardTileLayersControl extends PureComponent {
                 this.createLayerCheckboxes() :
                 <div className='controls-pane-background-text'>Controlled by feed</div>
             }
+            <div style={{ textAlign: 'center' }}>
+              {
+                !this.state.referenceError ? 
+                <div>
+                  <Slider
+                    min={-30}
+                    max={30}
+                    step={0.1}
+                    value={this.state.altitudeThreshold}
+                    onChange={this.onSlide}
+                  >
+                  </Slider>
+                  Change threshold: {this.state.altitudeThreshold}
+                </div> : this.state.referenceError
+              }
+            </div>   
           </CardContent>
         </Collapse>
       </Card>

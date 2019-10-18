@@ -22,7 +22,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 import Utility from '../../../../../Utility';
 import ViewerUtility from '../../../ViewerUtility';
-import DataPaneUtility from '../../DataPaneUtility';
 
 import './GeoMessageForm.css';
 import ApiManager from '../../../../../ApiManager';

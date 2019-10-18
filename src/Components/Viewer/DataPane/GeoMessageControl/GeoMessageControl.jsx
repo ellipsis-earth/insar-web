@@ -1,31 +1,6 @@
 import React, { PureComponent } from 'react';
-import { GeoJSON } from 'react-leaflet';
-
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  Typography,
-  CircularProgress,
-  Button,
-  Select,
-  MenuItem,
-  Collapse,
-  IconButton,
-  Input,
-  Checkbox,
-  ListItemText,
-  InputLabel,
-  FormControl
-} from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import SaveAlt from '@material-ui/icons/SaveAlt';
-
-import ViewerUtility from '../../ViewerUtility';
-import DataPaneUtility from '../DataPaneUtility';
 
 import './GeoMessageControl.css';
-import ApiManager from '../../../../ApiManager';
 
 import ElementGeoMessageControl from './ElementGeoMessageControl';
 import FeedGeoMessageControl from './FeedGeoMessageControl';
@@ -33,12 +8,6 @@ import FeedGeoMessageControl from './FeedGeoMessageControl';
 class GeoMessageControl extends PureComponent {
   constructor(props, context) {
     super(props, context);
-  }
-
-  componentDidMount() {
-  }
-
-  componentDidUpdate(prevProps) {
   }
 
   render() {

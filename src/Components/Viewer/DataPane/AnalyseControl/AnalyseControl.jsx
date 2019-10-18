@@ -16,10 +16,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import ViewerUtility from '../../ViewerUtility';
-import DataPaneUtility from '../DataPaneUtility';
 
 import './AnalyseControl.css';
 import ApiManager from '../../../../ApiManager';
+import Viewer from '../../Viewer';
 
 class AnalyseControl extends PureComponent {
 
@@ -52,8 +52,8 @@ class AnalyseControl extends PureComponent {
       this.setState({ referenceData: null });
     }
 
-    let differentElement = DataPaneUtility.isDifferentElement(prevProps.element, element);
-    let differentReferenceElement = DataPaneUtility.isDifferentElement(prevProps.referenceElement, referenceElement);
+    let differentElement = ViewerUtility.isDifferentElement(prevProps.element, element);
+    let differentReferenceElement = ViewerUtility.isDifferentElement(prevProps.referenceElement, referenceElement);
 
     if ((!this.state.measurementsData && !this.state.measurementsLoading) || differentElement) {
       this.setState({ measurementsData: null, measurementsLoading: true });
@@ -158,7 +158,7 @@ class AnalyseControl extends PureComponent {
             let value = measurementsRow[field];
 
             if (field === 'displacement') {
-              value -= referenceRow[field];
+              value = referenceRow[field] - value;
             }
 
             csvRowArray.push(value);
@@ -212,8 +212,6 @@ class AnalyseControl extends PureComponent {
         referenceElementProperties.tileY
       );
     }
-
-
 
     let fileName = nameComponents.join('_') + '.csv';
 
