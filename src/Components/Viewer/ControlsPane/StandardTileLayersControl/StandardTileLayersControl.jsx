@@ -297,7 +297,8 @@ class StandardTileLayersControl extends PureComponent {
       type: ViewerUtility.standardTileLayerType,
       filters: {
         forms: ['displacement'],
-        bounds: bounds
+        bounds: bounds,
+        userGroups: ['scripters']
       }
     };
 
@@ -313,19 +314,25 @@ class StandardTileLayersControl extends PureComponent {
           return null;
         }
 
-        let uniqueTiles = [];
-        for (let i = 0; i < geoMessages.length; i++) {
-          let tileId = geoMessages[i].elementId;
+        let filteredGeoMessages = [];
+        for (let i = geoMessages.messages.length - 1; i >= 0; i--) {
+          let geoMessageInfo = geoMessages.messages[i];
 
-          if (!uniqueTiles.find(x => x.tileX === tileId.tileX && x.tileY === tileId.tileY && x.zoom === tileId.zoom)) {
-            uniqueTiles.push(tileId);
+          let existingInfo = filteredGeoMessages.find(x => {
+            return x.elementId.tileX === geoMessageInfo.elementId.tileX &&
+              x.elementId.tileY === geoMessageInfo.elementId.tileY &&
+              x.elementId.zoom === geoMessageInfo.elementId.zoom
+          });
+
+          if (!existingInfo) {
+            filteredGeoMessages.push(geoMessageInfo);
           }
-        }        
+        }
 
         body = {
           mapId: map.id,
           type: ViewerUtility.standardTileLayerType,
-          messageIds: geoMessages.messages.map(x => x.id)
+          messageIds: filteredGeoMessages.map(x => x.id)
         };
 
         return ApiManager.post('/geoMessage/get', body, this.props.user);  
@@ -408,7 +415,8 @@ class StandardTileLayersControl extends PureComponent {
       type: ViewerUtility.standardTileLayerType,
       filters: {
         tileIds: [{ tileX: properties.tileX, tileY: properties.tileY, zoom: properties.zoom }],
-        forms: ['displacement']
+        forms: ['displacement'],
+        userGroups: ['scripters']
       }
     };
 
@@ -419,9 +427,9 @@ class StandardTileLayersControl extends PureComponent {
           return null;
         }
 
-        let geoMessageIds = geoMessages.messages.map(x => x.id);
+        let lastGeoMessage = geoMessages.messages[geoMessages.messages.length - 1];
 
-        body.messageIds = geoMessageIds;
+        body.messageIds = [lastGeoMessage.id];
 
         return ApiManager.post('/geomessage/get', body, this.props.user)
       })
