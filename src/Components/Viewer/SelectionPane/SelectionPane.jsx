@@ -38,9 +38,53 @@ class SelectionPane extends PureComponent {
       this.setState({ isOpen: false });
     }
     else if (prevProps.element !== this.props.element) {
-      this.setState({ isOpen: true, altitude: null });
-      this.getAltitude();
+      this.setState({ isOpen: true, altitude: null, displacement: null });
+
+      if (this.props.element.type === ViewerUtility.standardTileLayerType) {
+        this.getData();
+        this.getAltitude();
+      }
     }
+  }
+
+  getData = () => {
+    let properties = this.props.element.feature.properties;
+
+    let body = {
+      mapId: this.props.map.id,
+      type: ViewerUtility.standardTileLayerType,
+      filters: {
+        tileIds: [{ tileX: properties.tileX, tileY: properties.tileY, zoom: properties.zoom }],
+        forms: ['displacement'],
+        userGroups: ['scripters']
+      }
+    };
+
+    return ApiManager.post(`/geomessage/ids`, body, this.props.user)
+      .then((geoMessages) => {
+
+        if (geoMessages.messages.length === 0) {
+          this.setState({ displacement: 'no displacement geomessage' });
+          return null;
+        }
+
+        let lastGeoMessage = geoMessages.messages[geoMessages.messages.length - 1];
+
+        body.messageIds = [lastGeoMessage.id];
+
+        return ApiManager.post('/geomessage/get', body, this.props.user)
+      })
+      .then((geoMessages) => {
+        if (geoMessages === null) {
+          return null;
+        }
+
+        let lastGeoMessage = geoMessages[geoMessages.length - 1];
+
+        let displacement = lastGeoMessage.form.answers[0].answer;
+        
+        this.setState({ displacement: displacement });
+      });
   }
 
   getAltitude = () => {
@@ -59,6 +103,7 @@ class SelectionPane extends PureComponent {
       dataType: ViewerUtility.dataType.meanMeasurement,
       className: 'all classes'
     };
+
     return ApiManager.post(`/data/timestamps`, body, this.props.user)
       .then(result => {
         let parseFunc = async () => {
@@ -293,6 +338,15 @@ class SelectionPane extends PureComponent {
       properties.push((
         <div key='altitude'>
           {`altitude: ${altitudeText}`}
+        </div>
+      ));
+
+      let displacementText = this.state.displacement !== undefined && this.state.displacement !== null ? 
+        this.state.displacement : 'loading...' ;
+
+      properties.push((
+        <div key='displacement'>
+          {`displacement: ${displacementText}`}
         </div>
       ));
     }
