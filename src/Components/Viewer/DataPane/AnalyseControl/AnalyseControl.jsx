@@ -44,8 +44,6 @@ class AnalyseControl extends PureComponent {
     let element = this.props.element;
     let referenceElement = this.props.referenceElement;
 
-    debugger;
-
     if (!element) {
       this.setState({ measurementsData: null });
       return;

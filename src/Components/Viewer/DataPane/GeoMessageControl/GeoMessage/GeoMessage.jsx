@@ -218,8 +218,6 @@ class GeoMessage extends PureComponent {
       let elementIdText = null;
       let type = this.props.type;
 
-      debugger;
-
       if (type === ViewerUtility.standardTileLayerType) {
         elementIdText = `standard tile: ${message.elementId.tileX}, ${message.elementId.tileY}, ${message.elementId.zoom}`;
       }
