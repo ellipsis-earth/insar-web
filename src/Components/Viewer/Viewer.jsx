@@ -325,7 +325,7 @@ class Viewer extends PureComponent {
       <GeoJSON
         key={Math.random()}
         data={geoJson}
-        style={ViewerUtility.createGeoJsonLayerStyle('#ff0000', 2, 0.3)}
+        style={ViewerUtility.createGeoJsonLayerStyle('#ff0000', 4, 0.5)}
         pane={markerPane}
         onEachFeature={(_, layer) => layer.on({ click: () => {
           this.selectFeature(
@@ -383,7 +383,7 @@ class Viewer extends PureComponent {
       <GeoJSON
         key={Math.random()}
         data={geoJson}
-        style={ViewerUtility.createGeoJsonLayerStyle(color, 2, 0.3)}
+        style={ViewerUtility.createGeoJsonLayerStyle(color, 4, 0.5)}
         pane={markerPane}
         onEachFeature={(_, layer) => layer.on({ click: () => this.selectionPane.current.open() })}
       />

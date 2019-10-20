@@ -38,7 +38,8 @@ export class LineChart extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.data !== prevProps.data || this.props.type !== prevProps.type) {
+    if (this.props.data !== prevProps.data || this.props.type !== prevProps.type ||
+      this.props.referenceData !== prevProps.referenceData) {
       let graphElements = this.prepareGraph();
       this.setState({ graphElements: graphElements });
     }

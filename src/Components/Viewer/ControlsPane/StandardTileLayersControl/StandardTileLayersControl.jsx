@@ -289,7 +289,7 @@ class StandardTileLayersControl extends PureComponent {
           <GeoJSON
             key={Math.random()}
             data={standardTilesGeoJson}
-            style={ViewerUtility.createGeoJsonLayerStyle('cornflowerblue')}
+            style={ViewerUtility.createGeoJsonLayerStyle('cornflowerblue', 1, 0.35)}
             zIndex={ViewerUtility.standardTileLayerZIndex}
             onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
           />
@@ -390,9 +390,8 @@ class StandardTileLayersControl extends PureComponent {
             let altitude = geoMessage.form.answers[0].answer;
 
             let diff = altitude - referenceAltitude;
-
   
-            if (diff < threshold) {
+            if (diff > threshold) {
               continue;
             }
           }         
@@ -436,7 +435,7 @@ class StandardTileLayersControl extends PureComponent {
           <GeoJSON
             key={Math.random()}
             data={altitudeTilesGeoJson}
-            style={ViewerUtility.createGeoJsonLayerStyle('cornflowerblue')}
+            style={ViewerUtility.createGeoJsonLayerStyle('cornflowerblue', 1, 0.35)}
             zIndex={ViewerUtility.standardTileLayerZIndex + 1}
             onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
           />

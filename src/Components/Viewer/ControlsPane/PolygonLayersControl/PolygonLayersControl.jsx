@@ -228,7 +228,7 @@ class PolygonLayersControl extends PureComponent {
             <GeoJSON
               key={Math.random()}
               data={polygonsGeoJson}
-              style={ViewerUtility.createGeoJsonLayerStyle(`#${polygonLayer.color}`)}
+              style={ViewerUtility.createGeoJsonLayerStyle(`#${polygonLayer.color}`, 1, 0.35)}
               zIndex={ViewerUtility.polygonLayerZIndex + i}
               onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature, polygonLayer.hasAggregatedData) })}
             />
