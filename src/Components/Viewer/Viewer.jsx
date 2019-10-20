@@ -659,6 +659,7 @@ class Viewer extends PureComponent {
               user={this.props.user}
               map={this.state.map}
               element={this.state.selectedElement}
+              referenceElement={this.state.referenceElement}
               onDataPaneAction={this.onDataPaneAction}
               onFlyTo={this.onFlyTo}
               onDeselect={this.deselectCurrentElement}
