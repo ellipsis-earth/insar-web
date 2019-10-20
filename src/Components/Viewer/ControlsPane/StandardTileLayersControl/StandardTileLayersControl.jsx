@@ -10,7 +10,8 @@ import {
   Collapse,
   IconButton,
   Slider,
-  Typography
+  Typography,
+  CircularProgress
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SaveAlt from '@material-ui/icons/SaveAlt';
@@ -35,7 +36,7 @@ const ALTITUDE_CHANGE_LAYER = {
   name: ALTITUDE_CHANGE
 };
 
-const MAX_TILES = 500;
+const MAX_TILES = 1000;
 
 class StandardTileLayersControl extends PureComponent {
 
@@ -100,10 +101,7 @@ class StandardTileLayersControl extends PureComponent {
           }
           else {
             this.setState({ referenceData: data, referenceError: null }, () => {
-              this.prepareLayers(this.props.map, this.props.timestampRange, this.state.selectedLayers)
-                .then(leafletLayers => {
-                  this.props.onLayersChange(leafletLayers);
-                });
+              this.prepareLayers(this.props.map, this.props.timestampRange, this.state.selectedLayers);
             });
           }
         });
@@ -125,10 +123,7 @@ class StandardTileLayersControl extends PureComponent {
         });
       }
 
-      this.prepareLayers(this.props.map, this.props.timestampRange, selectedLayers)
-        .then(leafletLayers => {
-          this.props.onLayersChange(leafletLayers);
-        });
+      this.prepareLayers(this.props.map, this.props.timestampRange, selectedLayers);
     }
   }
 
@@ -157,7 +152,7 @@ class StandardTileLayersControl extends PureComponent {
         let className = '';
         let downloadButton = null;
 
-        if (count > MAX_TILES) {
+        if (typeof count === 'string' || count instanceof String || count > MAX_TILES) {
           className = 'geometry-limit-exceeded';
         }
         else {
@@ -170,14 +165,35 @@ class StandardTileLayersControl extends PureComponent {
             </IconButton>
           );
         }
-
+        
         counter = (
           <span className='geometry-counter'>
-            <span className={className}>{count}</span>
-            <span>/{MAX_TILES}</span>
-            {downloadButton}
+            <CircularProgress className='loading-spinner'/>
           </span>
-        )
+        );
+
+        if (availableLayer.name === ALTITUDE_CHANGE_LAYER.name && this.state.altitudeChangeLoading) {
+          counter = (
+            <span className='geometry-counter'>
+              <CircularProgress 
+                className='loading-spinner' 
+                style={{ width: '20px', height: '20px', marginTop: '10px'}}
+              />
+            </span>
+          );
+        }
+        else {
+          counter = (
+            <span className='geometry-counter'>
+              <span className={className}>{count}</span>
+              {
+                !(typeof count === 'string' || count instanceof String) ?
+                  <span>/{MAX_TILES}</span> : null
+              }
+              {downloadButton}
+            </span>
+          );
+        }        
       }
 
       let option = (
@@ -212,10 +228,15 @@ class StandardTileLayersControl extends PureComponent {
     }   
 
     if (selectedLayers.includes(ALTITUDE_CHANGE_LAYER)) {
+      this.setState({ altitudeChangeLoading: true })
       promises.push(this.prepareAltitudeChange(map, timestampRange));
     }
 
-    return Promise.all(promises);
+    return Promise.all(promises)
+      .then(standardTilesLayers => {
+        this.setState({ altitudeChangeLoading: false });
+        this.props.onLayersChange(standardTilesLayers);
+      });;
   }
 
   prepareStandardTileLayer = async (map, timestampRange) => {
@@ -306,11 +327,17 @@ class StandardTileLayersControl extends PureComponent {
 
     let leafletGeojsonLayer = ApiManager.post('/geoMessage/ids', body, this.props.user)
       .then((geoMessages) => {
-        if (!geoMessages || geoMessages.messages.length === 0 || geoMessages.messages.length > MAX_TILES) {
+        if (!geoMessages || geoMessages.messages.length === 0) {
           let count = {...count};
           count[ALTITUDE_CHANGE_LAYER.name] = geoMessages.messages.length;
+          this.setState({ count: count });  
+          return null;
+        }
+
+        if (geoMessages.messages.length > MAX_TILES) {
+          let count = {...count};
+          count[ALTITUDE_CHANGE_LAYER.name] = 'zoom in further';
           this.setState({ count: count });
-  
           return null;
         }
 
@@ -329,13 +356,24 @@ class StandardTileLayersControl extends PureComponent {
           }
         }
 
-        body = {
-          mapId: map.id,
-          type: ViewerUtility.standardTileLayerType,
-          messageIds: filteredGeoMessages.map(x => x.id)
-        };
+        let getPromises = [];
+        while (filteredGeoMessages.length > 0) {
+          body = {
+            mapId: map.id,
+            type: ViewerUtility.standardTileLayerType,
+            messageIds: filteredGeoMessages.splice(0, 500).map(x => x.id)
+          };
 
-        return ApiManager.post('/geoMessage/get', body, this.props.user);  
+          getPromises.push(ApiManager.post('/geoMessage/get', body, this.props.user));
+        }
+
+        return Promise.all(getPromises)
+          .then((results) => {
+            let geoMessages = [];
+            results.forEach(x => geoMessages = geoMessages.concat(x));
+
+            return geoMessages;
+          });  
       })
       .then((geoMessages) => {
         if (!geoMessages) {
@@ -352,10 +390,11 @@ class StandardTileLayersControl extends PureComponent {
             let altitude = geoMessage.form.answers[0].answer;
 
             let diff = altitude - referenceAltitude;
+
   
-            if (diff > threshold) {
+            if (diff < threshold) {
               continue;
-            }  
+            }
           }         
 
           let tileId = geoMessage.elementId;
@@ -472,10 +511,7 @@ class StandardTileLayersControl extends PureComponent {
 
     if (changed) {
       this.setState({ selectedLayers: newSelectedLayers });
-      this.prepareLayers(this.props.map, this.props.timestampRange, newSelectedLayers)
-        .then(standardTilesLayers => {
-          this.props.onLayersChange(standardTilesLayers);
-        });
+      this.prepareLayers(this.props.map, this.props.timestampRange, newSelectedLayers);
     }
   }
 
@@ -524,10 +560,7 @@ class StandardTileLayersControl extends PureComponent {
       clearTimeout(this.onDownloadTimer);
 
       this.onDownloadTimer = setTimeout(() => {
-        this.prepareLayers(this.props.map, this.props.timestampRange, this.state.selectedLayers)
-          .then(standardTilesLayers => {
-            this.props.onLayersChange(standardTilesLayers);
-          });
+        this.prepareLayers(this.props.map, this.props.timestampRange, this.state.selectedLayers);
       }, 1000);
     });
   }
