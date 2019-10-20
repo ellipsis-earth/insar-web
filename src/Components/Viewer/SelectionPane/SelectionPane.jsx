@@ -48,29 +48,68 @@ class SelectionPane extends PureComponent {
   }
 
   getData = () => {
-    let properties = this.props.element.feature.properties;
+    let element = this.props.element;
+    let referenceElement = this.props.referenceElement;
+
+    if (!referenceElement) {
+      this.setState({ displacement: 'no reference tile'});
+      return;
+    }
+
+    let properties = element.feature.properties;
+    let referenceProperties = referenceElement.feature.properties;
+
+    let tileId = { tileX: properties.tileX, tileY: properties.tileY, zoom: properties.zoom };
+    let referenceTileId = { tileX: referenceProperties.tileX, tileY: referenceProperties.tileY, zoom: referenceProperties.zoom };    
+
+    if (tileId.tileX === referenceTileId.tileX && tileId.tileY === referenceTileId.tileY 
+      && tileId.zoom === referenceTileId.zoom) {
+      this.setState({ displacement: 0 });
+      return;
+    }
 
     let body = {
       mapId: this.props.map.id,
       type: ViewerUtility.standardTileLayerType,
       filters: {
-        tileIds: [{ tileX: properties.tileX, tileY: properties.tileY, zoom: properties.zoom }],
+        tileIds: [ tileId, referenceTileId ],
         forms: ['displacement'],
         userGroups: ['scripters']
       }
     };
 
+    let tileMessageId = null;
+    let referenceMessageId = null;
+
     return ApiManager.post(`/geomessage/ids`, body, this.props.user)
       .then((geoMessages) => {
 
-        if (geoMessages.messages.length === 0) {
-          this.setState({ displacement: 'no displacement geomessage' });
+        let messages = geoMessages.messages;
+
+        let tileMessages = messages.filter(x => {
+          return x.elementId.tileX === tileId.tileX && 
+            x.elementId.tileY === tileId.tileY &&
+            x.elementId.zoom === tileId.zoom;
+        });
+
+        let referenceTileMessages = messages.filter(x => {
+          return x.elementId.tileX === referenceTileId.tileX && 
+            x.elementId.tileY === referenceTileId.tileY &&
+            x.elementId.zoom === referenceTileId.zoom;
+        });
+
+        if (tileMessages.length === 0 || referenceTileMessages.length === 0) {
+          this.setState({ displacement: 'no data' });
           return null;
         }
 
-        let lastGeoMessage = geoMessages.messages[geoMessages.messages.length - 1];
+        let lastGeoMessage = tileMessages[tileMessages.length - 1];
+        let lastReferenceGeoMessage = referenceTileMessages[referenceTileMessages.length - 1];
 
-        body.messageIds = [lastGeoMessage.id];
+        tileMessageId = lastGeoMessage.id;
+        referenceMessageId = lastReferenceGeoMessage.id;
+
+        body.messageIds = [tileMessageId, referenceMessageId];
 
         return ApiManager.post('/geomessage/get', body, this.props.user)
       })
@@ -79,9 +118,13 @@ class SelectionPane extends PureComponent {
           return null;
         }
 
-        let lastGeoMessage = geoMessages[geoMessages.length - 1];
+        let tileGeoMessage = geoMessages.find(x => x.id === tileMessageId);
+        let referenceTileGeoMessage = geoMessages.find(x => x.id === referenceMessageId);
 
-        let displacement = lastGeoMessage.form.answers[0].answer;
+        let tileDisplacement = tileGeoMessage.form.answers[0].answer;
+        let referenceTileDisplacement = referenceTileGeoMessage.form.answers[0].answer;
+
+        let displacement = tileDisplacement - referenceTileDisplacement;
         
         this.setState({ displacement: displacement });
       });
