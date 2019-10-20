@@ -603,8 +603,8 @@ class StandardTileLayersControl extends PureComponent {
                 !this.state.referenceError ? 
                 <div>
                   <Slider
-                    min={-30}
-                    max={30}
+                    min={-50}
+                    max={50}
                     step={0.1}
                     value={this.state.altitudeThreshold}
                     onChange={this.onSlide}
