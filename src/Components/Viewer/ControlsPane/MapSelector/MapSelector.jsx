@@ -69,8 +69,10 @@ export class MapSelector extends PureComponent {
       return;
     }
 
-    let map = this.state.maps.find(x => x.info.subatlas === atlas && x.info.type === INSAR_TYPE);
-    let altitudeMap = this.state.maps.find(x => x.info.subatlas === atlas && x.info.type === ALTITUDE_TYPE);
+    let maps = this.state.maps;
+
+    let map = maps.find(x => x.info.subatlas === atlas && x.info.type === INSAR_TYPE);
+    let altitudeMap = maps.find(x => x.info.subatlas === atlas && x.info.type === ALTITUDE_TYPE);
 
     map.altitudeMap = altitudeMap;
 

@@ -18,10 +18,7 @@ import ViewerUtility from '../../../ViewerUtility';
 const NO_DATA_RESULT = 'no data\n';
 const DATE_COLUMN_NAME = 'date_to';
 
-const CLOUD_COVER_COLUMN_INFO = {
-  name: 'cloud_cover',
-  color: 'bababaff'
-};
+const REFERENCED_COLUMNS = ['displacement', 'cumulativeDisplacement'];
 
 export class LineChart extends PureComponent {
   constructor(props, context) {
@@ -109,7 +106,7 @@ export class LineChart extends PureComponent {
 
         let date = Moment(row[DATE_COLUMN_NAME]).unix() * 1000;
 
-        if (columnName === 'displacement') {
+        if (REFERENCED_COLUMNS.includes(columnName)) {
           let referenceValue = referenceRow ? referenceRow[columnName] : 0;
           value = value - referenceValue;
         }
