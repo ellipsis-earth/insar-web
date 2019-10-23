@@ -109,9 +109,23 @@ class PolygonLayersControl extends PureComponent {
     let availableLayers = this.state.availableLayers;
     let selectedLayers = this.state.selectedLayers;
 
+    let _5To10cm = availableLayers.find(x => x.id === '27754dd0-b554-4d49-af2b-bd96c816ff75');
+    let sortedLayers = [];
     for (let i = 0; i < availableLayers.length; i++) {
-
       let availableLayer = availableLayers[i];
+
+      if (availableLayer.id !== _5To10cm.id) {
+        sortedLayers.push(availableLayer);
+      }
+
+      if (availableLayer.id === 'd581b7e9-0575-4b83-a3fa-14bca7c5f08d') {
+        sortedLayers.push(_5To10cm);
+      }
+    }
+
+    for (let i = 0; i < sortedLayers.length; i++) {
+
+      let availableLayer = sortedLayers[i];
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
       let counter = null;
