@@ -106,20 +106,30 @@ class PolygonLayersControl extends PureComponent {
   createLayerCheckboxes = () => {
     let options = [];
 
-    let availableLayers = this.state.availableLayers;
+    let availableLayers = this.state.availableLayers.sort((a, b) => {
+      if (a.name > b.name) {
+        return 1;
+      }
+      else if (a.name < b.name) {
+        return -1;
+      }
+      else {
+        return 0;
+      }
+    });
     let selectedLayers = this.state.selectedLayers;
 
-    let _5To10cm = availableLayers.find(x => x.id === '27754dd0-b554-4d49-af2b-bd96c816ff75');
+    let oddLayer = availableLayers.find(x => x.id === 'e2d2d8b5-ec63-4f85-b8ea-515d743d1ad6');
     let sortedLayers = [];
     for (let i = 0; i < availableLayers.length; i++) {
       let availableLayer = availableLayers[i];
 
-      if (availableLayer.id !== _5To10cm.id) {
+      if (availableLayer.id !== oddLayer.id) {
         sortedLayers.push(availableLayer);
       }
-
-      if (availableLayer.id === 'd581b7e9-0575-4b83-a3fa-14bca7c5f08d') {
-        sortedLayers.push(_5To10cm);
+      
+      if (availableLayer.id === 'ef6d2cf9-5af4-4656-aefa-72b4ffa2d203') {
+        sortedLayers.push(oddLayer);
       }
     }
 
