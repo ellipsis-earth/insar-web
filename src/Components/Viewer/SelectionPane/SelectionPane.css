@@ -45,3 +45,7 @@ button.selection-pane-button-single {
 .no-text-transform {
   text-transform: none;
 }
+
+.no-reference-tile-warning {
+  color: red;
+}

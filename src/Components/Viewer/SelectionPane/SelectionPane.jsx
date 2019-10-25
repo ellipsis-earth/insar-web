@@ -45,6 +45,10 @@ class SelectionPane extends PureComponent {
         this.getAltitude();
       }
     }
+
+    if (prevProps.referenceElement !== this.props.referenceElement) {
+      this.getData();
+    }
   }
 
   getData = () => {
@@ -52,7 +56,6 @@ class SelectionPane extends PureComponent {
     let referenceElement = this.props.referenceElement;
 
     if (!referenceElement) {
-      this.setState({ displacement: 'no reference tile'});
       return;
     }
 
@@ -124,7 +127,7 @@ class SelectionPane extends PureComponent {
         let tileDisplacement = tileGeoMessage.form.answers[0].answer;
         let referenceTileDisplacement = referenceTileGeoMessage.form.answers[0].answer;
 
-        let displacement = tileDisplacement - referenceTileDisplacement;
+        let displacement = (tileDisplacement - referenceTileDisplacement).toFixed(2);
         
         this.setState({ displacement: displacement });
       });
@@ -162,7 +165,7 @@ class SelectionPane extends PureComponent {
         return parseFunc();
       })
       .then(result => {
-        let altitude = result.data[0]['altitude'];
+        let altitude = parseFloat(result.data[0]['altitude']).toFixed(2);
         
         this.setState({ altitude: altitude });
       });
@@ -281,7 +284,7 @@ class SelectionPane extends PureComponent {
         size='small'
         className='selection-pane-button'
         onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.analyse)}
-        disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData}
+        disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData || !this.props.referenceElement}
       >
         {'ANALYSE'}
       </Button>
@@ -374,9 +377,18 @@ class SelectionPane extends PureComponent {
     let elementProperties = element.feature.properties;
     let properties = [];
 
+    if (!this.props.referenceElement) {
+      properties.push((
+        <div className='no-reference-tile-warning' key='no-reference-tile'>
+          {'No reference tile selected'}
+        </div>
+      ));
+    }
+
     if (element.type === ViewerUtility.standardTileLayerType) {
-      let altitudeText = this.state.altitude !== undefined && this.state.altitude !== null ? 
-        this.state.altitude : 'loading...' ;
+      let altitudeReady = this.state.altitude !== undefined && this.state.altitude !== null;
+
+      let altitudeText = altitudeReady ? `${this.state.altitude}m` : 'loading...';
 
       properties.push((
         <div key='altitude'>
@@ -384,20 +396,22 @@ class SelectionPane extends PureComponent {
         </div>
       ));
 
-      let displacementText = this.state.displacement !== undefined && this.state.displacement !== null ? 
-        this.state.displacement : 'loading...' ;
+      if (this.props.referenceElement) {
+        let displacementReady = this.state.displacement !== undefined && this.state.displacement !== null;
 
-      properties.push((
-        <div key='displacement'>
-          {`displacement: ${displacementText}`}
-        </div>
-      ));
+        let displacementText = displacementReady ? `${this.state.displacement}cm` : 'loading';
+
+        properties.push((
+          <div key='displacement'>
+            {`displacement: ${displacementText}`}
+          </div>
+        ));   
+      }
     }
     
     let selectionPaneClass = 'selection-pane';
 
     for (let property in elementProperties) {
-
       let propertyValue = elementProperties[property];
 
       if (element.type === ViewerUtility.drawnPolygonLayerType && property === 'id') {
