@@ -22,6 +22,15 @@ import ApiManager from '../../../../ApiManager';
 
 const MAX_POLYGONS = 500;
 
+const LAYER_ORDER = [
+  'd581b7e9-0575-4b83-a3fa-14bca7c5f08d', // 0
+  'e2d2d8b5-ec63-4f85-b8ea-515d743d1ad6', // 2
+  '27754dd0-b554-4d49-af2b-bd96c816ff75', // 4
+  '0038c6ba-0d04-4063-b6d4-7f691fa95145', // 6
+  '007d81bf-8f56-4e95-bf5c-bfedf4c22b5f', // 8
+  'ef6d2cf9-5af4-4656-aefa-72b4ffa2d203', // 10
+];
+
 class PolygonLayersControl extends PureComponent {
 
   layerGeoJsons = {}
@@ -119,19 +128,19 @@ class PolygonLayersControl extends PureComponent {
     });
     let selectedLayers = this.state.selectedLayers;
 
-    let oddLayer = availableLayers.find(x => x.id === 'e2d2d8b5-ec63-4f85-b8ea-515d743d1ad6');
     let sortedLayers = [];
-    for (let i = 0; i < availableLayers.length; i++) {
-      let availableLayer = availableLayers[i];
 
-      if (availableLayer.id !== oddLayer.id) {
-        sortedLayers.push(availableLayer);
+    availableLayers.forEach(x => {
+      if (!LAYER_ORDER.includes(x.id)) {
+        sortedLayers.push(x);
       }
-      
-      if (availableLayer.id === 'ef6d2cf9-5af4-4656-aefa-72b4ffa2d203') {
-        sortedLayers.push(oddLayer);
-      }
-    }
+    });    
+
+    LAYER_ORDER.forEach(x => {
+      let layer = availableLayers.find(y => y.id === x);
+      sortedLayers.push(layer);
+    });
+
 
     for (let i = 0; i < sortedLayers.length; i++) {
 
