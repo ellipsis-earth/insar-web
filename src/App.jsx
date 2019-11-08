@@ -46,16 +46,17 @@ class App extends Component {
     this.state = {
       init: false,
       user: null,
+      accountOpen: false,
     };
+
+    this.accountsUrl = 'https://account.ellipsis-earth.com/';
   }
 
   componentDidMount() {
     Modal.setAppElement('body');
-
-
-
-        return this.retrieveUser();
     
+    window.addEventListener("message", this.receiveMessage, false);
+    return this.retrieveUser();
   }
 
   closeMenu = () => {
@@ -88,9 +89,35 @@ class App extends Component {
       });
   }
 
+  receiveMessage = (event) => {
+    if (/*event.origin === 'http://localhost:3000' || */'https://account.ellipsis-earth.com') 
+    {
+      if (event.data.type)
+      {
+        if (event.data.type === 'login')
+        {
+          this.onLogin(event.data.data);
+        }
+        if (event.data.type === 'logout')
+        {
+          this.onLogout();
+        }
+        if (event.data.type === 'overlayClose')
+        {
+          this.setState({accountOpen: false}, this.setHome())
+        }
+      }
+    }
+  }
 
+  setHome = () => {
+    let iframe = document.getElementById("account");
+    iframe.contentWindow.postMessage({type: 'home'}, this.accountsUrl);
+  }
 
-
+  openAccounts = (open = !this.state.accountOpen) => {
+    this.setState({accountOpen: open})
+  }
 
   scrollToBottom = () => {
     this.bottomItemRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -99,7 +126,7 @@ class App extends Component {
   onLogin = (user) => {
     localStorage.setItem(localStorageUserItem, JSON.stringify(user));
     this.setState({ user: user }, () => {
-      this.props.history.push('/');
+      //this.props.history.push('/');
     });
   }
 
@@ -121,6 +148,14 @@ class App extends Component {
 
     let contentClassName = 'content';
 
+    if (this.state.accountOpen)
+    {
+      let initObject = {type: 'init'};
+      if (this.state.user){initObject.data = this.state.user}
+      let iframe = document.getElementById("account");
+      iframe.contentWindow.postMessage(initObject, this.accountsUrl);
+    }
+
     return (
       <div className='App' onClick={this.closeMenu}>
         <ThemeProvider theme={theme}>
@@ -129,14 +164,15 @@ class App extends Component {
                   user={this.state.user}
                   onLanguageChange={this.onLanguageChange}
                   scrollToBottom={this.scrollToBottom}
+                  openAccounts={this.openAccounts}
                 />
-
             }
             <div className={contentClassName}>
               <div ref={this.topItemRef}></div>
               <Route exact path='/'
                 render={() =>
                   <Viewer
+                    key={this.state.user ? this.state.user.name : 'default'}
                     user = {this.state.user}
                     scrollToBottom={this.scrollToBottom}
                   />
@@ -159,6 +195,9 @@ class App extends Component {
                   />
                 }
               />
+              <div className={this.state.accountOpen ? 'account' : 'hidden'}>
+                <iframe src={this.accountsUrl} id='account'/>
+              </div>
               <div ref={this.bottomItemRef}></div>
             </div>
 

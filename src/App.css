@@ -274,6 +274,28 @@ button.MuiTab-root {
   min-width: 0px;
 }
 
+.account
+{
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.account iframe {
+  height: 100%;
+  width: 100%;
+  border: none;
+}
+
+.hidden
+{
+  display: none;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

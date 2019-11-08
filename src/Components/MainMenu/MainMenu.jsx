@@ -105,25 +105,20 @@ export class MainMenu extends Component {
           onToggle={this.onToggle}
         >
           <Navbar.Brand>
-            <NavLink exact to='/' className='main-menu-logo-item noselect' onClick={() => this.onNavItemClick('home')}>
+            <NavLink exact to='/' className='main-menu-logo-item noselect' onClick={() => {this.props.openAccounts(false); this.onNavItemClick('home')}}>
               <img className='main-menu-logo' src='/images/logos/logo_v2_white_sat.svg' alt='Ellipsis Earth Intelligence'/>
+              <span style={{ position: 'relative', top: '7px', color: 'white'}}>
+                INSAR
+              </span>
             </NavLink>
-            <span style={{ position: 'relative', top: '7px'}}>
-              INSAR
-            </span>
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls='basic-navbar-nav' style={{ height: '45px' }} />
-          <Navbar.Collapse id='basic-navbar-nav'>
-            <Nav className='mr-auto'>
-              <NavItem>
-                <NavLink to={this.props.user ? '/account': '/login'} onClick={() => this.onNavItemClick(navKeys.login)}>
-                  <ToggleButton selected={navItemClass(navKeys.login)} value={this.props.user ? this.props.user.username : 'Login'}>
-                    {this.props.user ? this.props.user.username : 'Login'}
-                  </ToggleButton>
-                </NavLink>
-              </NavItem>
-            </Nav>
-          </Navbar.Collapse>
+          <Nav>
+            <NavItem>
+              <ToggleButton selected={navItemClass(navKeys.login)} value={this.props.user ? this.props.user.username : 'Login'} onClick={() => this.props.openAccounts()}>
+                {this.props.user ? this.props.user.username : 'Login'}
+              </ToggleButton>
+            </NavItem>
+          </Nav>
         </Navbar>
       </div>
     )
