@@ -18,7 +18,8 @@ import ViewerUtility from '../../../ViewerUtility';
 const NO_DATA_RESULT = 'no data\n';
 const DATE_COLUMN_NAME = 'date_to';
 
-const REFERENCED_COLUMNS = ['displacement', 'cumulativeDisplacement'];
+const CUMULATIVE_DISPLACEMENT = 'cumulativeDisplacement';
+const REFERENCED_COLUMNS = ['displacement', CUMULATIVE_DISPLACEMENT];
 
 export class LineChart extends PureComponent {
   constructor(props, context) {
@@ -95,6 +96,10 @@ export class LineChart extends PureComponent {
     for (let i = 0; i < filteredColumnNames.length; i++ ) {
 
       let columnName = filteredColumnNames[i];
+
+      if (columnName !== CUMULATIVE_DISPLACEMENT) {
+        continue;
+      }
 
       let singleSeriesData = [];
 
@@ -176,6 +181,12 @@ export class LineChart extends PureComponent {
 
     let legendItems = [];
     for (let i = 0; i < adjustedColumnInfo.length; i++) {
+      let name = adjustedColumnInfo[i].name;
+      
+      if (name !== CUMULATIVE_DISPLACEMENT) {
+        continue;
+      }
+
       legendItems.push({
         title: adjustedColumnInfo[i].name,
         color: `#${adjustedColumnInfo[i].color}`
