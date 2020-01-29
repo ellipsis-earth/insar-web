@@ -138,12 +138,13 @@ class PolygonLayersControl extends PureComponent {
 
     LAYER_ORDER.forEach(x => {
       let layer = availableLayers.find(y => y.id === x);
-      sortedLayers.push(layer);
+      if (layer) {
+        sortedLayers.push(layer);
+      }
     });
 
 
     for (let i = 0; i < sortedLayers.length; i++) {
-
       let availableLayer = sortedLayers[i];
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
