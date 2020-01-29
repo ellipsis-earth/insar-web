@@ -22,6 +22,7 @@ import ApiManager from '../../../../ApiManager';
 
 const MAX_POLYGONS = 500;
 
+// Apparently hardcoded to sort only for Semarang map?
 const LAYER_ORDER = [
   'd581b7e9-0575-4b83-a3fa-14bca7c5f08d', // 0
   'e2d2d8b5-ec63-4f85-b8ea-515d743d1ad6', // 2
