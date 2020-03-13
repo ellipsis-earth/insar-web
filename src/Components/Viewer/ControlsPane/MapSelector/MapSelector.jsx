@@ -94,26 +94,18 @@ export class MapSelector extends PureComponent {
       return Promise.resolve();
     }
 
-    let promises = [];
-    
-    for (let i = 0; i < METADATA_TYPES.length; i++) {
-      let metadataType = METADATA_TYPES[i];
-
-      promises.push(
-        ApiManager.post('/metadata', { mapId: map.id, type: metadataType.key }, this.props.user)
-      );
-    }
-
-    return Promise.all(promises)
-      .then(results => {
-        map.layers = {};
-
-        for (let i = 0; i < results.length; i++) {
-          let result = results[i];
-          let metadataType = METADATA_TYPES[i];
-
-          metadataType.function(map, result);
-        }
+    return ApiManager.post('/metadata', { mapId: map.id }, this.props.user)
+      .then(result => {        
+        map.timestamps = result.timestamps;
+        map.classes = result.classes;
+        map.measurements = result.measurements;
+        map.layers = {
+          tile: result.mapLayers,
+          polygon: result.polygonLayers
+        };
+        map.bands = result.bands;
+        map.forms = result.forms;
+        map.model = result.model
 
         map.metadataLoaded = true;
       });

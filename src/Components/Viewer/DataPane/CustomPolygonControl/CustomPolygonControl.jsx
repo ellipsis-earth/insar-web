@@ -124,11 +124,11 @@ class CustomPolygonControl extends PureComponent {
     let feature = this.props.element.feature;
     feature.properties = this.state.propertyValues;
 
-    let timestampNumber = this.props.map.timestamps[this.props.timestampRange.end].timestampNumber;
+    let timestamp = this.props.map.timestamps[this.props.timestampRange.end].timestamp;
 
     let body = {
       mapId: this.props.map.id,
-      timestamp: timestampNumber,
+      timestamp: timestamp,
       layer: layer,
       feature: feature
     };

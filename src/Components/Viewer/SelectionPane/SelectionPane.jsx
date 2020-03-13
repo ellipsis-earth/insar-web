@@ -377,7 +377,7 @@ class SelectionPane extends PureComponent {
     let elementProperties = element.feature.properties;
     let properties = [];
 
-    if (!this.props.referenceElement) {
+    if (!this.props.referenceElement && element.type === ViewerUtility.standardTileLayerType) {
       properties.push((
         <div className='no-reference-tile-warning' key='no-reference-tile'>
           {'No reference tile selected'}

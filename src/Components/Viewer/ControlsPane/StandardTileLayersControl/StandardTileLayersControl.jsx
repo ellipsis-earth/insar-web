@@ -245,7 +245,7 @@ class StandardTileLayersControl extends PureComponent {
     let body =  {
       mapId: map.id,
       type: ViewerUtility.standardTileLayerType,
-      timestamp: map.timestamps[timestampRange.end].timestampNumber,
+      timestamp: map.timestamps[timestampRange.end].timestamp,
       xMin: bounds.xMin,
       xMax: bounds.xMax,
       yMin: bounds.yMin,
@@ -256,7 +256,7 @@ class StandardTileLayersControl extends PureComponent {
 
     let leafletGeojsonLayer = await ApiManager.post('/geometry/ids', body, this.props.user)
       .then(standardTileIds => {
-        let count = {...count};
+        let count = {...this.state.count};
         count[STANDARD_TILES_LAYER.name] = standardTileIds.count
         this.setState({ count: count });
 
@@ -268,7 +268,7 @@ class StandardTileLayersControl extends PureComponent {
         body = {
           mapId: map.id,
           type: ViewerUtility.standardTileLayerType,
-          timestamp: map.timestamps[timestampRange.end].timestampNumber,
+          timestamp: map.timestamps[timestampRange.end].timestamp,
           elementIds: standardTileIds.ids
         };
 
@@ -305,7 +305,7 @@ class StandardTileLayersControl extends PureComponent {
     let body =  {
       mapId: map.id,
       type: ViewerUtility.standardTileLayerType,
-      timestamp: map.timestamps[timestampRange.end].timestampNumber,
+      timestamp: map.timestamps[timestampRange.end].timestamp,
       xMin: bounds.xMin,
       xMax: bounds.xMax,
       yMin: bounds.yMin,

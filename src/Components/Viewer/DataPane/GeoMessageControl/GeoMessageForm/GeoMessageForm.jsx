@@ -235,7 +235,7 @@ class GeoMessageForm extends PureComponent {
       let body = {
         mapId: this.props.map.id,
         type: element.type,
-        timestamp: timestamp.timestampNumber,
+        timestamp: timestamp.timestamp,
         message: this.state.messageText,
         image: this.uploadedImage,
         private: this.state.private

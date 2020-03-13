@@ -220,7 +220,7 @@ class TileLayersControl extends PureComponent {
         }
 
         // Find the layer information of the timestamp.
-        let mapTimestampTileLayers = map.layers.tile.find(x => x.timestampNumber === mapTimestamp.timestampNumber);
+        let mapTimestampTileLayers = map.layers.tile.find(x => x.timestamp === mapTimestamp.timestamp);
 
         if (!mapTimestampTileLayers) {
           continue;
@@ -251,8 +251,8 @@ class TileLayersControl extends PureComponent {
             leafletTileLayersGrouped.push(leafletTileLayersGroup);
           }
 
-          let key = `${map.id}_${mapTimestamp.timestampNumber}_${tileLayer.type}_${tileLayer.name}`;
-          let url = `${ApiManager.apiUrl}/tileService/${map.id}/${mapTimestamp.timestampNumber}/${tileLayer.name}/{z}/{x}/{y}`;
+          let key = `${map.id}_${mapTimestamp.timestamp}_${tileLayer.type}_${tileLayer.name}`;
+          let url = `${ApiManager.apiUrl}/tileService/${map.id}/${mapTimestamp.timestamp}/${tileLayer.name}/{z}/{x}/{y}`;
           let zIndex = tileLayerType.zIndex + leafletTileLayersGroup.zIndexOffset + leafletTileLayersGroup.leafletTileLayers.length;
 
           if (this.props.user) {

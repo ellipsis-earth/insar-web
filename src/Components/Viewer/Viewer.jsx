@@ -556,7 +556,7 @@ class Viewer extends PureComponent {
     let body = {
       mapId: map.id,
       type: type,
-      timestamp: map.timestamps[this.state.timestampRange.end].timestampNumber
+      timestamp: map.timestamps[this.state.timestampRange.end].timestamp
     };
 
     if (type === ViewerUtility.flyToType.standardTile) {

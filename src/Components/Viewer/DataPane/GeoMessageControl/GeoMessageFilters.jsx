@@ -198,7 +198,7 @@ class FeedGeoMessageControl extends PureComponent {
 
       let body = {
         mapId: map.id,
-        timestamp: map.timestamps[timestampRange.end].timestampNumber
+        timestamp: map.timestamps[timestampRange.end].timestamp
       };
 
       let url = '';

@@ -223,7 +223,7 @@ class FeedGeoMessageControl extends PureComponent {
       let body = {
         mapId: map.id,
         type: type,
-        timestamp: map.timestamps[timestampRange.end].timestampNumber,
+        timestamp: map.timestamps[timestampRange.end].timestamp,
         elementIds: filteredElements,
       };
 
