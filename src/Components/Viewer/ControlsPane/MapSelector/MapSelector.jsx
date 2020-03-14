@@ -105,7 +105,7 @@ export class MapSelector extends PureComponent {
         };
         map.bands = result.bands;
         map.forms = result.forms;
-        map.model = result.model
+        map.model = result.models;
 
         map.metadataLoaded = true;
       });
