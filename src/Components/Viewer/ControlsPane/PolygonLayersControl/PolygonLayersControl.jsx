@@ -207,7 +207,7 @@ class PolygonLayersControl extends PureComponent {
 
     for (let i = 0; i < availableLayers.length; i++) {
 
-      let polygonLayer = availableLayers[i]
+      let polygonLayer = availableLayers[i];
 
       if (!selectedLayers.find(x => x.name === polygonLayer.name)) {
         continue;
@@ -226,51 +226,55 @@ class PolygonLayersControl extends PureComponent {
         limit: MAX_POLYGONS
       };
 
-      let leafletGeojsonLayerPromise = ApiManager.post('/geometry/ids', body, this.props.user)
-        .then(polygonIds => {
-          let count = {
-            ...this.state.count,
-          };
-          count[polygonLayer.name] = polygonIds.count;
+      let leafletGeojsonLayerPromise = async (polygonLayer) => {
+        return ApiManager.post('/geometry/ids', body, this.props.user)
+          .then(polygonIds => {
+            let count = {
+              ...this.state.count,
+            };
+            count[polygonLayer.name] = polygonIds.count;
 
-          this.setState({ count: count });
+            this.setState({ count: count });
 
-          if (!polygonIds || polygonIds.count === 0 || polygonIds.count > MAX_POLYGONS) {
-            this.layerGeoJsons[polygonLayer.name] = null;
-            return null;
-          }
+            if (!polygonIds || polygonIds.count === 0 || polygonIds.count > MAX_POLYGONS) {
+              this.layerGeoJsons[polygonLayer.name] = null;
+              return null;
+            }
 
-          body = {
-            mapId: map.id,
-            type: ViewerUtility.polygonLayerType,
-            elementIds: polygonIds.ids
-          };
+            body = {
+              mapId: map.id,
+              type: ViewerUtility.polygonLayerType,
+              elementIds: polygonIds.ids
+            };
 
-          return ApiManager.post('/geometry/get', body, this.props.user);
-        })
-        .then(polygonsGeoJson => {
-          if (!polygonsGeoJson) {
-            this.layerGeoJsons[polygonLayer.name] = null;
-            return null;
-          }
+            return ApiManager.post('/geometry/get', body, this.props.user);
+          })
+          .then(polygonsGeoJson => {
+            if (!polygonsGeoJson) {
+              this.layerGeoJsons[polygonLayer.name] = null;
+              return null;
+            }
 
-          this.layerGeoJsons[polygonLayer.name] = {
-            geoJson: polygonsGeoJson,
-            bounds: bounds
-          };
+            this.layerGeoJsons[polygonLayer.name] = {
+              geoJson: polygonsGeoJson,
+              bounds: bounds
+            };
 
-          return (
-            <GeoJSON
-              key={Math.random()}
-              data={polygonsGeoJson}
-              style={ViewerUtility.createGeoJsonLayerStyle(`#${polygonLayer.color}`, 1, 0.35)}
-              zIndex={ViewerUtility.polygonLayerZIndex + i}
-              onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature, polygonLayer.hasAggregatedData) })}
-            />
-          );
-        });
+            let style = ViewerUtility.createGeoJsonLayerStyle(`#${polygonLayer.color}`, 1, 0.35);
 
-      promises.push(leafletGeojsonLayerPromise);
+            return (
+              <GeoJSON
+                key={Math.random()}
+                data={polygonsGeoJson}
+                style={style}
+                zIndex={ViewerUtility.polygonLayerZIndex + i}
+                onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature, polygonLayer.hasAggregatedData) })}
+              />
+            );
+          });
+      }
+
+      promises.push(leafletGeojsonLayerPromise(polygonLayer));
     }
 
     let leafletGeoJsonLayers = await Promise.all(promises);
