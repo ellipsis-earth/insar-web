@@ -80,7 +80,7 @@ class PolygonLayersControl extends PureComponent {
 
       if (differentMap) {
         availableLayers = this.props.map.layers.polygon;
-        selectedLayers = [];
+        selectedLayers = [...availableLayers];
         this.layerGeoJsons = {};
 
         this.setState({

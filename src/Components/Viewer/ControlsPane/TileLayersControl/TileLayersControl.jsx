@@ -59,7 +59,7 @@ const tileLayerTypes = [
   }
 ];
 
-const DEFAULT_SELECTED_LAYERS = [BASE_SATELLITE_LAYER_NAME, 'interferogram'];
+const DEFAULT_SELECTED_LAYERS = [BASE_SATELLITE_LAYER_NAME];
 
 class TileLayersControl extends PureComponent {
 
